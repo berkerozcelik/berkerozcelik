@@ -10,7 +10,8 @@ import {
   Alert,
   ActivityIndicator,
   Dimensions,
-  Linking
+  Linking,
+  Modal
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -41,15 +42,82 @@ interface HealthRecord {
   recorded_at: string;
 }
 
+interface PredictiveAnalysis {
+  id: string;
+  prediction_type: string;
+  title: string;
+  description: string;
+  probability: number;
+  timeline: string;
+  recommendations: string[];
+  severity: 'low' | 'medium' | 'high';
+  category: 'treatment' | 'nutrition' | 'lifestyle' | 'medication';
+}
+
 export default function Index() {
   const [user, setUser] = useState<User | null>(null);
   const [latestHealth, setLatestHealth] = useState<HealthRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentMood, setCurrentMood] = useState(3); // Başlangıçta 'İyi' 
   const [activeTab, setActiveTab] = useState('home');
+  const [showPredictionModal, setShowPredictionModal] = useState(false);
+  const [selectedPrediction, setSelectedPrediction] = useState<PredictiveAnalysis | null>(null);
+  const [predictiveAnalysis, setPredictiveAnalysis] = useState<PredictiveAnalysis[]>([]);
 
   const moodEmojis = ['😰', '😟', '😐', '😊', '😁'];
   const moodTexts = ['Çok Kötü', 'Kötü', 'Normal', 'İyi', 'Çok İyi'];
+
+  // AI Tahmine Dayalı Analiz - Mock Data (gerçek uygulamada AI'dan gelecek)
+  const mockPredictiveData: PredictiveAnalysis[] = [
+    {
+      id: '1',
+      prediction_type: 'treatment_response',
+      title: 'Kemoterapi Yan Etkisi Tahmini',
+      description: 'Kemoterapi seansından 2-3 gün sonra vücut sıcaklığınızda yükselme beklenmektedir.',
+      probability: 85,
+      timeline: '2-3 gün içinde',
+      recommendations: [
+        'Günde en az 2.5 litre sıvı tüketin',
+        'C vitamini açısından zengin meyveleri tercih edin',
+        'Vücut sıcaklığınızı günde 3 kez ölçün',
+        'Ateş 38.5°C üzerine çıkarsa doktorunuza başvurun'
+      ],
+      severity: 'medium',
+      category: 'treatment'
+    },
+    {
+      id: '2',
+      prediction_type: 'nutrition_need',
+      title: 'Beslenme Gereksinimi Analizi',
+      description: 'Mevcut kilo kaybı trendine göre protein ihtiyacınız artacak.',
+      probability: 92,
+      timeline: '1 hafta içinde',
+      recommendations: [
+        'Günlük protein alımını 1.2g/kg vücut ağırlığına çıkarın',
+        'Omega-3 açısından zengin balık tüketin',
+        'Probiyotik yoğurt ve kefir ekleyin',
+        'Küçük ve sık öğünler tercih edin'
+      ],
+      severity: 'high',
+      category: 'nutrition'
+    },
+    {
+      id: '3',
+      prediction_type: 'energy_level',
+      title: 'Enerji Seviyesi Öngörüsü',
+      description: 'Uyku kalitenizdeki iyileşme ile enerji seviyeniz %15 artacak.',
+      probability: 78,
+      timeline: '5-7 gün içinde',
+      recommendations: [
+        'Düzenli uyku saatlerini koruyun',
+        '20 dakikalık hafif yürüyüş yapın',
+        'Magnezyum açısından zengin yiyecekler tüketin',
+        'Stres yönetimi teknikleri uygulayın'
+      ],
+      severity: 'low',
+      category: 'lifestyle'
+    }
+  ];
 
   // Today's tasks
   const todayTasks = [
@@ -71,6 +139,7 @@ export default function Index() {
 
   useEffect(() => {
     checkAuthStatus();
+    loadPredictiveAnalysis();
   }, []);
 
   const checkAuthStatus = async () => {
@@ -100,6 +169,18 @@ export default function Index() {
       }
     } catch (error) {
       console.error('Health data fetch error:', error);
+    }
+  };
+
+  const loadPredictiveAnalysis = async () => {
+    try {
+      // Gerçek uygulamada bu AI endpoint'inden gelecek
+      // const response = await axios.get(`${BACKEND_URL}/api/predictive-analysis`);
+      setPredictiveAnalysis(mockPredictiveData);
+    } catch (error) {
+      console.error('Predictive analysis error:', error);
+      // Hata durumunda mock data kullan
+      setPredictiveAnalysis(mockPredictiveData);
     }
   };
 
@@ -141,6 +222,30 @@ export default function Index() {
   const toggleTaskCompletion = (taskId: number) => {
     // Task completion logic here
     Alert.alert('Görev', 'Görev durumu güncellendi!');
+  };
+
+  const getPredictionIcon = (category: string) => {
+    switch (category) {
+      case 'treatment': return 'medical-services';
+      case 'nutrition': return 'restaurant';
+      case 'lifestyle': return 'fitness-center';
+      case 'medication': return 'medication';
+      default: return 'psychology';
+    }
+  };
+
+  const getPredictionColor = (severity: string) => {
+    switch (severity) {
+      case 'high': return theme.colors.error;
+      case 'medium': return theme.colors.warning;
+      case 'low': return theme.colors.success;
+      default: return theme.colors.info;
+    }
+  };
+
+  const openPredictionDetail = (prediction: PredictiveAnalysis) => {
+    setSelectedPrediction(prediction);
+    setShowPredictionModal(true);
   };
 
   if (loading) {
@@ -200,6 +305,43 @@ export default function Index() {
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <MaterialIcons name="logout" size={24} color={theme.colors.textSecondary} />
           </TouchableOpacity>
+        </View>
+
+        {/* Tahmine Dayalı Sağlık Analizi - YENİ MODÜL */}
+        <View style={styles.predictiveAnalysisContainer}>
+          <View style={styles.analysisHeader}>
+            <MaterialIcons name="psychology" size={28} color={theme.colors.strongTeal} />
+            <Text style={styles.analysisTitle}>AI Sağlık Öngörüleri</Text>
+          </View>
+          <Text style={styles.analysisSubtitle}>
+            Sağlık verileriniz analiz edilerek kişiselleştirilmiş öngörüler oluşturuldu
+          </Text>
+          
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.predictionsScroll}>
+            {predictiveAnalysis.map((prediction) => (
+              <TouchableOpacity 
+                key={prediction.id} 
+                style={styles.predictionCard}
+                onPress={() => openPredictionDetail(prediction)}
+              >
+                <View style={styles.predictionHeader}>
+                  <MaterialIcons 
+                    name={getPredictionIcon(prediction.category)} 
+                    size={20} 
+                    color={getPredictionColor(prediction.severity)} 
+                  />
+                  <View style={[styles.probabilityBadge, { backgroundColor: getPredictionColor(prediction.severity) }]}>
+                    <Text style={styles.probabilityText}>{prediction.probability}%</Text>
+                  </View>
+                </View>
+                <Text style={styles.predictionTitle}>{prediction.title}</Text>
+                <Text style={styles.predictionTimeline}>{prediction.timeline}</Text>
+                <Text numberOfLines={2} style={styles.predictionDesc}>
+                  {prediction.description}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Bugün Daha İyisin - Interaktif ve Büyük */}
@@ -386,6 +528,66 @@ export default function Index() {
         </View>
       </ScrollView>
 
+      {/* Predictive Analysis Detail Modal */}
+      <Modal
+        visible={showPredictionModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowPredictionModal(false)}>
+              <Text style={styles.modalCancel}>Kapat</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>AI Sağlık Öngörüsü</Text>
+            <View style={styles.placeholder} />
+          </View>
+          
+          {selectedPrediction && (
+            <ScrollView style={styles.modalContent}>
+              <View style={styles.predictionDetailHeader}>
+                <MaterialIcons 
+                  name={getPredictionIcon(selectedPrediction.category)} 
+                  size={32} 
+                  color={getPredictionColor(selectedPrediction.severity)} 
+                />
+                <Text style={styles.predictionDetailTitle}>{selectedPrediction.title}</Text>
+                <View style={[styles.probabilityBadgeLarge, { backgroundColor: getPredictionColor(selectedPrediction.severity) }]}>
+                  <Text style={styles.probabilityTextLarge}>{selectedPrediction.probability}% Olasılık</Text>
+                </View>
+              </View>
+
+              <View style={styles.predictionDetailSection}>
+                <Text style={styles.sectionLabel}>Zaman Çizelgesi</Text>
+                <Text style={styles.sectionText}>{selectedPrediction.timeline}</Text>
+              </View>
+
+              <View style={styles.predictionDetailSection}>
+                <Text style={styles.sectionLabel}>Detaylı Açıklama</Text>
+                <Text style={styles.sectionText}>{selectedPrediction.description}</Text>
+              </View>
+
+              <View style={styles.predictionDetailSection}>
+                <Text style={styles.sectionLabel}>Kişiselleştirilmiş Öneriler</Text>
+                {selectedPrediction.recommendations.map((recommendation, index) => (
+                  <View key={index} style={styles.recommendationItem}>
+                    <MaterialIcons name="check-circle" size={16} color={theme.colors.success} />
+                    <Text style={styles.recommendationText}>{recommendation}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <View style={styles.aiDisclaimer}>
+                <MaterialIcons name="info" size={16} color={theme.colors.info} />
+                <Text style={styles.disclaimerText}>
+                  Bu öngörüler AI analizi ile oluşturulmuştur. Tıbbi kararlarda mutlaka doktorunuzla görüşün.
+                </Text>
+              </View>
+            </ScrollView>
+          )}
+        </SafeAreaView>
+      </Modal>
+
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
         <TouchableOpacity 
@@ -542,6 +744,81 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     padding: 8,
+  },
+
+  // Tahmine Dayalı Sağlık Analizi - YENİ MODÜL
+  predictiveAnalysisContainer: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    padding: 20,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  analysisHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  analysisTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginLeft: 12,
+  },
+  analysisSubtitle: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  predictionsScroll: {
+    marginHorizontal: -4,
+  },
+  predictionCard: {
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 4,
+    width: 240,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.strongTeal,
+  },
+  predictionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  probabilityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  probabilityText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  predictionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 6,
+  },
+  predictionTimeline: {
+    fontSize: 12,
+    color: theme.colors.strongTeal,
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  predictionDesc: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
   },
 
   // İyileştirme kartı - Büyük ve Interaktif
@@ -890,6 +1167,100 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textSecondary,
     textAlign: 'center',
+  },
+
+  // Prediction Detail Modal
+  modalContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  modalCancel: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  placeholder: {
+    width: 40,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  predictionDetailHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  predictionDetailTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    textAlign: 'center',
+    marginVertical: 12,
+  },
+  probabilityBadgeLarge: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  probabilityTextLarge: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  predictionDetailSection: {
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 8,
+  },
+  sectionText: {
+    fontSize: 15,
+    color: theme.colors.textSecondary,
+    lineHeight: 22,
+  },
+  recommendationItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+    paddingLeft: 8,
+  },
+  recommendationText: {
+    fontSize: 15,
+    color: theme.colors.text,
+    marginLeft: 12,
+    flex: 1,
+    lineHeight: 22,
+  },
+  aiDisclaimer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: theme.colors.backgroundSecondary,
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 24,
+  },
+  disclaimerText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginLeft: 12,
+    flex: 1,
+    lineHeight: 20,
   },
   
   // Bottom Navigation
