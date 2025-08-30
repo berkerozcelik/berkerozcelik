@@ -529,66 +529,141 @@ export default function HealthRecords() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Chart Selection */}
-        <View style={styles.chartSelection}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <TouchableOpacity 
-              style={[styles.metricButton, selectedMetric === 'weight' && styles.selectedMetric]}
-              onPress={() => setSelectedMetric('weight')}
-            >
-              <MaterialIcons name="monitor-weight" size={20} color={selectedMetric === 'weight' ? '#FFFFFF' : theme.colors.strongTeal} />
-              <Text style={[styles.metricText, selectedMetric === 'weight' && styles.selectedMetricText]}>Kilo</Text>
-            </TouchableOpacity>
+        {/* Period Selection */}
+        <View style={styles.periodSelection}>
+          <Text style={styles.sectionTitle}>📅 Zaman Aralığı</Text>
+          <View style={styles.periodButtons}>
+            {[
+              { key: '7d', label: '7 Gün' },
+              { key: '30d', label: '30 Gün' },
+              { key: '90d', label: '90 Gün' }
+            ].map((period) => (
+              <TouchableOpacity
+                key={period.key}
+                style={[
+                  styles.periodButton,
+                  selectedPeriod === period.key && styles.activePeriodButton
+                ]}
+                onPress={() => setSelectedPeriod(period.key)}
+              >
+                <Text style={[
+                  styles.periodButtonText,
+                  selectedPeriod === period.key && styles.activePeriodButtonText
+                ]}>
+                  {period.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-            <TouchableOpacity 
-              style={[styles.metricButton, selectedMetric === 'temperature' && styles.selectedMetric]}
-              onPress={() => setSelectedMetric('temperature')}
-            >
-              <MaterialIcons name="thermostat" size={20} color={selectedMetric === 'temperature' ? '#FFFFFF' : theme.colors.strongTeal} />
-              <Text style={[styles.metricText, selectedMetric === 'temperature' && styles.selectedMetricText]}>Ateş</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.metricButton, selectedMetric === 'sleep' && styles.selectedMetric]}
-              onPress={() => setSelectedMetric('sleep')}
-            >
-              <MaterialIcons name="bedtime" size={20} color={selectedMetric === 'sleep' ? '#FFFFFF' : theme.colors.strongTeal} />
-              <Text style={[styles.metricText, selectedMetric === 'sleep' && styles.selectedMetricText]}>Uyku</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.metricButton, selectedMetric === 'steps' && styles.selectedMetric]}
-              onPress={() => setSelectedMetric('steps')}
-            >
-              <MaterialIcons name="directions-walk" size={20} color={selectedMetric === 'steps' ? '#FFFFFF' : theme.colors.strongTeal} />
-              <Text style={[styles.metricText, selectedMetric === 'steps' && styles.selectedMetricText]}>Adım</Text>
-            </TouchableOpacity>
+        {/* Metric Selection - Enhanced */}
+        <View style={styles.metricSelection}>
+          <Text style={styles.sectionTitle}>📊 Sağlık Metrikleri</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.metricsScroll}>
+            {[
+              { key: 'weight', icon: 'monitor-weight', label: 'Kilo', color: '#2196F3' },
+              { key: 'temperature', icon: 'thermostat', label: 'Ateş', color: '#FF9800' },
+              { key: 'sleep', icon: 'bedtime', label: 'Uyku', color: '#5AACB0' },
+              { key: 'steps', icon: 'directions-walk', label: 'Adım', color: '#4CAF50' },
+              { key: 'heart_rate', icon: 'favorite', label: 'Nabız', color: '#F44336' },
+              { key: 'blood_pressure', icon: 'monitor-heart', label: 'Tansiyon', color: '#9C27B0' }
+            ].map((metric) => (
+              <TouchableOpacity
+                key={metric.key}
+                style={[
+                  styles.metricCard,
+                  selectedMetric === metric.key && styles.activeMetricCard,
+                  { borderLeftColor: metric.color }
+                ]}
+                onPress={() => setSelectedMetric(metric.key)}
+              >
+                <MaterialIcons 
+                  name={metric.icon as any} 
+                  size={24} 
+                  color={selectedMetric === metric.key ? '#FFFFFF' : metric.color} 
+                />
+                <Text style={[
+                  styles.metricCardText,
+                  selectedMetric === metric.key && styles.activeMetricCardText
+                ]}>
+                  {metric.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
 
-        {/* Chart Display */}
+        {/* Advanced Chart Display */}
         <View style={styles.chartSection}>
-          {selectedMetric === 'weight' && renderChart(mockHealthData.weight, 'Kilo Takibi', 'kg', theme.colors.info)}
-          {selectedMetric === 'temperature' && renderChart(mockHealthData.temperature, 'Vücut Sıcaklığı', '°C', theme.colors.warning)}
-          {selectedMetric === 'sleep' && renderChart(mockHealthData.sleep, 'Uyku Süresi', 's', theme.colors.strongTeal)}
-          {selectedMetric === 'steps' && renderChart(mockHealthData.steps, 'Günlük Adım', '', theme.colors.success)}
+          {renderAdvancedChart()}
         </View>
 
-        {/* Summary Cards */}
-        <View style={styles.summaryContainer}>
-          <View style={styles.summaryCard}>
-            <MaterialIcons name="monitor-weight" size={32} color={theme.colors.info} />
-            <Text style={styles.summaryValue}>68,5 kg</Text>
-            <Text style={styles.summaryLabel}>Son Kilo</Text>
+        {/* Health Insights */}
+        <View style={styles.insightsSection}>
+          <Text style={styles.sectionTitle}>💡 Sağlık İçgörüleri</Text>
+          <View style={styles.insightCards}>
+            <View style={styles.insightCard}>
+              <MaterialIcons name="trending-up" size={24} color={theme.colors.success} />
+              <Text style={styles.insightTitle}>Haftalık Gelişim</Text>
+              <Text style={styles.insightText}>
+                {selectedMetric === 'weight' && 'Kilo kontrolünüz başarılı! -0.2kg'}
+                {selectedMetric === 'steps' && 'Aktif yaşam tarzınız artıyor! +15%'}
+                {selectedMetric === 'sleep' && 'Uyku kaliteniz iyileşiyor! +0.5s'}
+                {selectedMetric === 'temperature' && 'Vücut sıcaklığınız normal aralıkta'}
+                {selectedMetric === 'heart_rate' && 'Kalp ritminiz ideal aralıkta'}
+                {selectedMetric === 'blood_pressure' && 'Tansiyon değerleriniz normal'}
+              </Text>
+            </View>
+            
+            <View style={styles.insightCard}>
+              <MaterialIcons name="lightbulb" size={24} color={theme.colors.warning} />
+              <Text style={styles.insightTitle}>Öneri</Text>
+              <Text style={styles.insightText}>
+                {selectedMetric === 'weight' && 'Düzenli kilo takibi için haftada 2 kez ölçüm yapın'}
+                {selectedMetric === 'steps' && 'Hedefi yakalamanız için günde 1500 adım daha atın'}
+                {selectedMetric === 'sleep' && 'Ideal uyku için 22:00\'de yatağa gidin'}
+                {selectedMetric === 'temperature' && 'Günlük ölçümlerinizi aksatmayın'}
+                {selectedMetric === 'heart_rate' && 'Stres yönetimi için nefes egzersizleri yapın'}
+                {selectedMetric === 'blood_pressure' && 'Tuz tüketiminizi azaltmayı deneyin'}
+              </Text>
+            </View>
           </View>
-          
-          <View style={styles.summaryCard}>
-            <MaterialIcons name="thermostat" size={32} color={theme.colors.warning} />
-            <Text style={styles.summaryValue}>36,5°C</Text>
-            <Text style={styles.summaryLabel}>Son Ateş</Text>
+        </View>
+
+        {/* Summary Cards - Enhanced */}
+        <View style={styles.enhancedSummaryContainer}>
+          <Text style={styles.sectionTitle}>📋 Güncel Değerler</Text>
+          <View style={styles.summaryGrid}>
+            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#E3F2FD' }]}>
+              <MaterialIcons name="monitor-weight" size={28} color="#2196F3" />
+              <Text style={styles.enhancedSummaryValue}>68,5 kg</Text>
+              <Text style={styles.enhancedSummaryLabel}>Son Kilo</Text>
+              <Text style={styles.summaryTrend}>📉 -0.2kg</Text>
+            </View>
+            
+            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#FFF3E0' }]}>
+              <MaterialIcons name="thermostat" size={28} color="#FF9800" />
+              <Text style={styles.enhancedSummaryValue}>36,5°C</Text>
+              <Text style={styles.enhancedSummaryLabel}>Son Ateş</Text>
+              <Text style={styles.summaryTrend}>✅ Normal</Text>
+            </View>
+            
+            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#E0F2F1' }]}>
+              <MaterialIcons name="bedtime" size={28} color="#5AACB0" />
+              <Text style={styles.enhancedSummaryValue}>7,3s</Text>
+              <Text style={styles.enhancedSummaryLabel}>Son Uyku</Text>
+              <Text style={styles.summaryTrend}>🌟 İyi</Text>
+            </View>
+            
+            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#E8F5E8' }]}>
+              <MaterialIcons name="directions-walk" size={28} color="#4CAF50" />
+              <Text style={styles.enhancedSummaryValue}>6.542</Text>
+              <Text style={styles.enhancedSummaryLabel}>Son Adım</Text>
+              <Text style={styles.summaryTrend}>🎯 82%</Text>
+            </View>
           </View>
-          
-          <View style={styles.summaryCard}>
+        </View>
             <MaterialIcons name="bedtime" size={32} color={theme.colors.strongTeal} />
             <Text style={styles.summaryValue}>7s 20dk</Text>
             <Text style={styles.summaryLabel}>Son Uyku</Text>
