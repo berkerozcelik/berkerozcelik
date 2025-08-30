@@ -668,6 +668,7 @@ export default function Medicines() {
           </View>
         )}
       </ScrollView>
+      </Animated.View>
 
       {/* Add Medicine Modal - Animated */}
       <Modal
