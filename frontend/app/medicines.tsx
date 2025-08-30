@@ -9,8 +9,8 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  TextInput,
-  Modal
+  Modal,
+  TextInput
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,12 +26,9 @@ interface Medicine {
   name: string;
   dosage: string;
   frequency: string;
-  times: string[];
-  start_date: string;
-  end_date?: string;
-  instructions?: string;
-  is_active: boolean;
-  created_at: string;
+  time: string;
+  taken: boolean;
+  interaction_warning?: boolean;
 }
 
 export default function Medicines() {
@@ -41,19 +38,47 @@ export default function Medicines() {
   const [newMedicine, setNewMedicine] = useState({
     name: '',
     dosage: '',
-    frequency: 'daily',
-    times: ['08:00'],
-    start_date: '',
-    end_date: '',
-    instructions: ''
+    frequency: 'Günde 1 kez',
+    time: ''
   });
 
-  const frequencies = [
-    { label: 'Günde 1 kez', value: 'daily', times: ['08:00'] },
-    { label: 'Günde 2 kez', value: 'twice_daily', times: ['08:00', '20:00'] },
-    { label: 'Günde 3 kez', value: 'three_times_daily', times: ['08:00', '14:00', '20:00'] },
-    { label: 'Haftada 1 kez', value: 'weekly', times: ['08:00'] },
-    { label: 'Gerektiğinde', value: 'as_needed', times: [] }
+  // Günlük ilaç listesi - screenshot'tan
+  const dailyMedicines = [
+    {
+      id: '1',
+      name: 'Metformin 500mg',
+      time: '09:00',
+      taken: false,
+      interaction_warning: false
+    },
+    {
+      id: '2',
+      name: 'Ondansetron 8mg',
+      time: '14:00',
+      taken: false,
+      interaction_warning: false
+    },
+    {
+      id: '3',
+      name: 'Etkileşim Uyarısı',
+      time: '',
+      taken: false,
+      interaction_warning: true
+    },
+    {
+      id: '4',
+      name: 'Tramadol 50mg',
+      time: '19:00',
+      taken: true,
+      interaction_warning: false
+    },
+    {
+      id: '5',
+      name: 'Letrozol 2,5mg',
+      time: '22:00',
+      taken: false,
+      interaction_warning: false
+    }
   ];
 
   useEffect(() => {
@@ -82,23 +107,21 @@ export default function Medicines() {
   };
 
   const handleAddMedicine = async () => {
-    if (!newMedicine.name || !newMedicine.dosage || !newMedicine.start_date) {
-      Alert.alert('Hata', 'Lütfen zorunlu alanları doldurun');
-      return;
-    }
-
     try {
       const token = await AsyncStorage.getItem('auth_token');
       if (!token) return;
+
+      if (!newMedicine.name || !newMedicine.dosage) {
+        Alert.alert('Hata', 'İlaç adı ve dozaj gereklidir');
+        return;
+      }
 
       const medicineData = {
         name: newMedicine.name,
         dosage: newMedicine.dosage,
         frequency: newMedicine.frequency,
-        times: newMedicine.times,
-        start_date: new Date(newMedicine.start_date).toISOString(),
-        end_date: newMedicine.end_date ? new Date(newMedicine.end_date).toISOString() : null,
-        instructions: newMedicine.instructions
+        time: newMedicine.time,
+        instructions: `${newMedicine.frequency} ${newMedicine.time ? newMedicine.time + ' saatinde' : ''} alınacak`
       };
 
       await axios.post(`${BACKEND_URL}/api/medicines`, medicineData, {
@@ -109,220 +132,127 @@ export default function Medicines() {
       setNewMedicine({
         name: '',
         dosage: '',
-        frequency: 'daily',
-        times: ['08:00'],
-        start_date: '',
-        end_date: '',
-        instructions: ''
+        frequency: 'Günde 1 kez',
+        time: ''
       });
       
-      Alert.alert('Başarılı', 'İlaç kaydedildi');
+      Alert.alert('Başarılı', 'İlaç başarıyla eklendi');
       fetchMedicines();
     } catch (error) {
-      Alert.alert('Hata', 'İlaç kaydedilirken bir hata oluştu');
+      console.error('Add medicine error:', error);
+      Alert.alert('Hata', 'İlaç eklenirken bir hata oluştu');
     }
   };
 
-  const updateFrequency = (frequency: string) => {
-    const freq = frequencies.find(f => f.value === frequency);
-    setNewMedicine({
-      ...newMedicine,
-      frequency,
-      times: freq ? freq.times : ['08:00']
-    });
-  };
-
-  const getTodaysDoses = (medicine: Medicine) => {
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    
-    return medicine.times.map(time => {
-      const [hours, minutes] = time.split(':').map(Number);
-      const medicineTime = hours * 60 + minutes;
-      
-      return {
-        time,
-        taken: medicineTime < currentTime, // Simulate taken status
-        upcoming: medicineTime > currentTime && medicineTime - currentTime < 120 // Next 2 hours
-      };
-    });
-  };
-
-  const getUpcomingMedicines = () => {
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    
-    return medicines
-      .filter(med => med.is_active)
-      .flatMap(medicine => 
-        medicine.times
-          .map(time => {
-            const [hours, minutes] = time.split(':').map(Number);
-            const medicineTime = hours * 60 + minutes;
-            
-            if (medicineTime > currentTime && medicineTime - currentTime < 240) { // Next 4 hours
-              return {
-                medicine,
-                time,
-                minutesUntil: medicineTime - currentTime
-              };
-            }
-            return null;
-          })
-          .filter(item => item !== null)
-      )
-      .sort((a, b) => a!.minutesUntil - b!.minutesUntil)
-      .slice(0, 3);
+  const toggleMedicineTaken = (medicineId: string) => {
+    // Toggle taken status for daily medicines
+    Alert.alert(
+      'İlaç Alındı',
+      'İlacınızı aldığınızı onaylıyor musunuz?',
+      [
+        { text: 'İptal', style: 'cancel' },
+        { text: 'Evet', onPress: () => console.log('Medicine taken:', medicineId) }
+      ]
+    );
   };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.medicine} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>İlaçlar yükleniyor...</Text>
       </View>
     );
   }
 
-  const upcomingMedicines = getUpcomingMedicines();
-
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={theme.colors.medicine} barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.backgroundLight} barStyle="dark-content" />
       
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <MaterialIcons name="arrow-back" size={24} color={theme.colors.textInverse} />
+          <MaterialIcons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>İlaç Takibi</Text>
+        <Text style={styles.headerTitle}>İlaçlarım</Text>
         <TouchableOpacity 
           style={styles.addButton}
           onPress={() => setShowAddModal(true)}
         >
-          <MaterialIcons name="create" size={24} color={theme.colors.textInverse} />
+          <MaterialIcons name="add" size={24} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        {/* Today's Reminder */}
-        {upcomingMedicines.length > 0 && (
-          <View style={styles.reminderCard}>
-            <View style={styles.reminderHeader}>
-              <MaterialIcons name="notifications-active" size={24} color={theme.colors.warning} />
-              <Text style={styles.reminderTitle}>Yaklaşan İlaçlar</Text>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Today's Medicines */}
+        <View style={styles.todaySection}>
+          <Text style={styles.sectionTitle}>Bugün</Text>
+          
+          {dailyMedicines.map((medicine) => (
+            <View key={medicine.id} style={[
+              styles.medicineCard,
+              medicine.interaction_warning && styles.warningCard
+            ]}>
+              {medicine.interaction_warning ? (
+                <View style={styles.warningContent}>
+                  <MaterialIcons name="warning" size={20} color={theme.colors.warning} />
+                  <Text style={styles.warningText}>Etkileşim Uyarısı</Text>
+                  <TouchableOpacity style={styles.checkboxEmpty}>
+                    <MaterialIcons name="check-box-outline-blank" size={20} color={theme.colors.strongTeal} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.medicineContent}>
+                  <View style={styles.medicineInfo}>
+                    <Text style={styles.medicineName}>{medicine.name}</Text>
+                    {medicine.time && (
+                      <Text style={styles.medicineTime}>{medicine.time}</Text>
+                    )}
+                  </View>
+                  <TouchableOpacity 
+                    style={medicine.taken ? styles.checkboxChecked : styles.checkboxEmpty}
+                    onPress={() => toggleMedicineTaken(medicine.id)}
+                  >
+                    <MaterialIcons 
+                      name={medicine.taken ? "check-box" : "check-box-outline-blank"} 
+                      size={20} 
+                      color={medicine.taken ? theme.colors.strongTeal : theme.colors.textLight} 
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-            {upcomingMedicines.map((item, index) => (
-              <View key={index} style={styles.reminderItem}>
-                <View style={styles.reminderInfo}>
-                  <Text style={styles.reminderMedicine}>{item!.medicine.name}</Text>
-                  <Text style={styles.reminderDosage}>{item!.medicine.dosage}</Text>
+          ))}
+        </View>
+
+        {/* Drug Interactions */}
+        <View style={styles.interactionsSection}>
+          <Text style={styles.sectionTitle}>İlaç Etkileşimleri</Text>
+          <Text style={styles.interactionDescription}>
+            Bazı ilaçlar arasında potansiyel etkileşimler olabilir.
+          </Text>
+          
+          <TouchableOpacity style={styles.addMedicineButton} onPress={() => setShowAddModal(true)}>
+            <Text style={styles.addMedicineText}>İlaç Ekle</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Medicine List */}
+        {medicines.length > 0 && (
+          <View style={styles.medicinesList}>
+            <Text style={styles.sectionTitle}>Tüm İlaçlarım</Text>
+            {medicines.map((medicine) => (
+              <View key={medicine.id} style={styles.medicineListCard}>
+                <View style={styles.medicineHeader}>
+                  <Text style={styles.medicineListName}>{medicine.name}</Text>
+                  <Text style={styles.medicineListDosage}>{medicine.dosage}</Text>
                 </View>
-                <View style={styles.reminderTime}>
-                  <Text style={styles.reminderTimeText}>{item!.time}</Text>
-                  <Text style={styles.reminderMinutes}>
-                    {item!.minutesUntil < 60 
-                      ? `${item!.minutesUntil} dk kaldı`
-                      : `${Math.floor(item!.minutesUntil / 60)} saat kaldı`
-                    }
-                  </Text>
-                </View>
+                <Text style={styles.medicineListFrequency}>{medicine.frequency}</Text>
               </View>
             ))}
           </View>
-        )}
-
-        {/* Medicine List */}
-        <Text style={styles.sectionTitle}>Aktif İlaçlarım</Text>
-        
-        {medicines.length === 0 ? (
-          <View style={styles.emptyState}>
-            <MaterialIcons name="medication" size={64} color={theme.colors.textLight} />
-            <Text style={styles.emptyTitle}>Henüz ilaç kaydınız yok</Text>
-            <Text style={styles.emptyDescription}>
-              İlk ilacınızı eklemek için yukarıdaki + butonunu kullanın
-            </Text>
-          </View>
-        ) : (
-          medicines
-            .filter(medicine => medicine.is_active)
-            .map((medicine) => {
-              const todaysDoses = getTodaysDoses(medicine);
-              
-              return (
-                <View key={medicine.id} style={styles.medicineCard}>
-                  <View style={styles.medicineHeader}>
-                    <View style={styles.medicineInfo}>
-                      <Text style={styles.medicineName}>{medicine.name}</Text>
-                      <Text style={styles.medicineDosage}>{medicine.dosage}</Text>
-                      <Text style={styles.medicineFrequency}>
-                        {frequencies.find(f => f.value === medicine.frequency)?.label || medicine.frequency}
-                      </Text>
-                    </View>
-                    <TouchableOpacity style={styles.medicineMoreButton}>
-                      <MaterialIcons name="more-vert" size={20} color={theme.colors.textSecondary} />
-                    </TouchableOpacity>
-                  </View>
-                  
-                  {/* Today's Schedule */}
-                  <View style={styles.scheduleContainer}>
-                    <Text style={styles.scheduleTitle}>Bugünkü Program:</Text>
-                    <View style={styles.scheduleList}>
-                      {todaysDoses.map((dose, index) => (
-                        <View key={index} style={styles.doseItem}>
-                          <View style={[
-                            styles.doseIndicator,
-                            dose.taken && styles.doseIndicatorTaken,
-                            dose.upcoming && styles.doseIndicatorUpcoming
-                          ]} />
-                          <Text style={[
-                            styles.doseTime,
-                            dose.taken && styles.doseTimeTaken
-                          ]}>
-                            {dose.time}
-                          </Text>
-                          <TouchableOpacity
-                            style={[
-                              styles.doseButton,
-                              dose.taken && styles.doseButtonTaken
-                            ]}
-                            onPress={() => {
-                              // Toggle taken status
-                              Alert.alert(
-                                'İlaç Durumu',
-                                dose.taken ? 'İlacı almadınız olarak işaretlensin mi?' : 'İlacı aldınız olarak işaretlensin mi?',
-                                [
-                                  { text: 'İptal', style: 'cancel' },
-                                  { text: 'Evet', onPress: () => {
-                                    // Here you would update the medicine status
-                                    Alert.alert('Bilgi', dose.taken ? 'İlaç alınmadı olarak işaretlendi' : 'İlaç alındı olarak işaretlendi');
-                                  }}
-                                ]
-                              );
-                            }}
-                          >
-                            <MaterialIcons 
-                              name={dose.taken ? "check-circle" : "radio-button-unchecked"} 
-                              size={20} 
-                              color={dose.taken ? theme.colors.success : theme.colors.textSecondary}
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                  
-                  {medicine.instructions && (
-                    <View style={styles.instructionsContainer}>
-                      <Text style={styles.instructionsTitle}>Kullanım Talimatı:</Text>
-                      <Text style={styles.instructionsText}>{medicine.instructions}</Text>
-                    </View>
-                  )}
-                </View>
-              );
-            })
         )}
       </ScrollView>
 
@@ -337,7 +267,7 @@ export default function Medicines() {
             <TouchableOpacity onPress={() => setShowAddModal(false)}>
               <Text style={styles.modalCancel}>İptal</Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Yeni İlaç</Text>
+            <Text style={styles.modalTitle}>Yeni İlaç Ekle</Text>
             <TouchableOpacity onPress={handleAddMedicine}>
               <Text style={styles.modalSave}>Kaydet</Text>
             </TouchableOpacity>
@@ -345,89 +275,108 @@ export default function Medicines() {
           
           <ScrollView style={styles.modalContent}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>İlaç Adı *</Text>
+              <Text style={styles.inputLabel}>İlaç Adı</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Örn: Parol 500mg"
+                placeholder="Örn: Paracetamol"
                 value={newMedicine.name}
                 onChangeText={(text) => setNewMedicine({...newMedicine, name: text})}
               />
             </View>
             
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Doz *</Text>
+              <Text style={styles.inputLabel}>Dozaj</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Örn: 1 tablet, 5ml"
+                placeholder="Örn: 500mg"
                 value={newMedicine.dosage}
                 onChangeText={(text) => setNewMedicine({...newMedicine, dosage: text})}
               />
             </View>
             
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Kullanım Sıklığı *</Text>
-              <ScrollView 
-                horizontal 
-                showsHorizontalScrollIndicator={false}
-                style={styles.frequencyScroll}
-              >
-                {frequencies.map((freq) => (
+              <Text style={styles.inputLabel}>Kullanım Sıklığı</Text>
+              <View style={styles.frequencyButtons}>
+                {['Günde 1 kez', 'Günde 2 kez', 'Günde 3 kez', 'Gerektiğinde'].map((freq) => (
                   <TouchableOpacity
-                    key={freq.value}
+                    key={freq}
                     style={[
-                      styles.frequencyChip,
-                      newMedicine.frequency === freq.value && styles.frequencyChipSelected
+                      styles.frequencyButton,
+                      newMedicine.frequency === freq && styles.selectedFrequency
                     ]}
-                    onPress={() => updateFrequency(freq.value)}
+                    onPress={() => setNewMedicine({...newMedicine, frequency: freq})}
                   >
-                    <Text
-                      style={[
-                        styles.frequencyChipText,
-                        newMedicine.frequency === freq.value && styles.frequencyChipTextSelected
-                      ]}
-                    >
-                      {freq.label}
+                    <Text style={[
+                      styles.frequencyText,
+                      newMedicine.frequency === freq && styles.selectedFrequencyText
+                    ]}>
+                      {freq}
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </ScrollView>
+              </View>
             </View>
             
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Başlangıç Tarihi *</Text>
+              <Text style={styles.inputLabel}>Saat (Opsiyonel)</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Örn: 2024-09-01"
-                value={newMedicine.start_date}
-                onChangeText={(text) => setNewMedicine({...newMedicine, start_date: text})}
-              />
-              <Text style={styles.inputHint}>Format: YYYY-MM-DD</Text>
-            </View>
-            
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Bitiş Tarihi (Opsiyonel)</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Örn: 2024-09-30"
-                value={newMedicine.end_date}
-                onChangeText={(text) => setNewMedicine({...newMedicine, end_date: text})}
-              />
-            </View>
-            
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Kullanım Talimatı</Text>
-              <TextInput
-                style={[styles.textInput, styles.textArea]}
-                placeholder="Örn: Yemekten sonra alınacak"
-                value={newMedicine.instructions}
-                onChangeText={(text) => setNewMedicine({...newMedicine, instructions: text})}
-                multiline
-                numberOfLines={3}
+                placeholder="Örn: 08:00"
+                value={newMedicine.time}
+                onChangeText={(text) => setNewMedicine({...newMedicine, time: text})}
               />
             </View>
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/')}
+        >
+          <MaterialIcons name="home" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Ana Sayfa</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
+          <MaterialIcons name="medication" size={24} color={theme.colors.strongTeal} />
+          <Text style={[styles.navText, styles.activeNavText]}>İlaçlar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/appointments')}
+        >
+          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Planım</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/health/records')}
+        >
+          <MaterialIcons name="favorite" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Sağlık</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/appointments')}
+        >
+          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Randevu</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/profile')}
+        >
+          <MaterialIcons name="person" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Profil</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -435,13 +384,13 @@ export default function Medicines() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: theme.colors.backgroundLight,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: theme.colors.backgroundLight,
   },
   loadingText: {
     marginTop: theme.spacing.base,
@@ -449,189 +398,161 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   header: {
-    backgroundColor: theme.colors.medicine,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
-    paddingTop: theme.spacing['4xl'],
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    paddingTop: 50,
+    backgroundColor: theme.colors.backgroundLight,
   },
   backButton: {
-    padding: theme.spacing.sm,
+    padding: 8,
   },
   headerTitle: {
-    ...theme.typography.h2,
-    color: theme.colors.textInverse,
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.strongTeal,
   },
   addButton: {
-    padding: theme.spacing.sm,
+    padding: 8,
   },
   content: {
     flex: 1,
-    padding: theme.spacing.base,
+    backgroundColor: theme.colors.backgroundLight,
   },
-  reminderCard: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
-    borderLeftWidth: 4,
-    borderLeftColor: theme.colors.warning,
-    ...theme.shadows.sm,
-  },
-  reminderHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  reminderTitle: {
-    ...theme.typography.h4,
-    marginLeft: theme.spacing.sm,
-  },
-  reminderItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.borderLight,
-  },
-  reminderInfo: {
-    flex: 1,
-  },
-  reminderMedicine: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-  },
-  reminderDosage: {
-    ...theme.typography.bodySecondary,
-    marginTop: theme.spacing.xs,
-  },
-  reminderTime: {
-    alignItems: 'flex-end',
-  },
-  reminderTimeText: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    color: theme.colors.warning,
-  },
-  reminderMinutes: {
-    ...theme.typography.caption,
-    marginTop: theme.spacing.xs,
+
+  // Today Section
+  todaySection: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   sectionTitle: {
-    ...theme.typography.h3,
-    marginBottom: theme.spacing.base,
-    paddingHorizontal: theme.spacing.xs,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: theme.spacing['5xl'],
-  },
-  emptyTitle: {
-    ...theme.typography.h3,
-    marginTop: theme.spacing.base,
-    textAlign: 'center',
-  },
-  emptyDescription: {
-    ...theme.typography.bodySecondary,
-    marginTop: theme.spacing.sm,
-    textAlign: 'center',
-    paddingHorizontal: theme.spacing.xl,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 16,
   },
   medicineCard: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.base,
-    ...theme.shadows.sm,
+    backgroundColor: theme.colors.lightBlue,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
   },
-  medicineHeader: {
+  warningCard: {
+    backgroundColor: '#FFF4E6',
+    borderWidth: 1,
+    borderColor: theme.colors.warning,
+  },
+  medicineContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: theme.spacing.md,
+    alignItems: 'center',
   },
   medicineInfo: {
     flex: 1,
   },
   medicineName: {
-    ...theme.typography.h4,
-    marginBottom: theme.spacing.xs,
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 4,
   },
-  medicineDosage: {
-    ...theme.typography.body,
+  medicineTime: {
+    fontSize: 14,
     color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
   },
-  medicineFrequency: {
-    ...theme.typography.bodySecondary,
-  },
-  medicineMoreButton: {
-    padding: theme.spacing.xs,
-  },
-  scheduleContainer: {
-    backgroundColor: theme.colors.backgroundSecondary,
-    borderRadius: theme.borderRadius.base,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-  },
-  scheduleTitle: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    marginBottom: theme.spacing.sm,
-  },
-  scheduleList: {
-    gap: theme.spacing.sm,
-  },
-  doseItem: {
+  warningContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: theme.spacing.xs,
   },
-  doseIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: theme.colors.textLight,
-    marginRight: theme.spacing.md,
-  },
-  doseIndicatorTaken: {
-    backgroundColor: theme.colors.success,
-  },
-  doseIndicatorUpcoming: {
-    backgroundColor: theme.colors.warning,
-  },
-  doseTime: {
-    ...theme.typography.body,
+  warningText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.warning,
+    marginLeft: 8,
     flex: 1,
   },
-  doseTimeTaken: {
-    textDecorationLine: 'line-through',
+  checkboxEmpty: {
+    padding: 4,
+  },
+  checkboxChecked: {
+    padding: 4,
+  },
+
+  // Interactions Section
+  interactionsSection: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  interactionDescription: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  addMedicineButton: {
+    backgroundColor: theme.colors.strongTeal,
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  addMedicineText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  // Medicine List
+  medicinesList: {
+    marginHorizontal: 16,
+    marginBottom: 100,
+  },
+  medicineListCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  medicineHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  medicineListName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  medicineListDosage: {
+    fontSize: 14,
     color: theme.colors.textSecondary,
   },
-  doseButton: {
-    padding: theme.spacing.xs,
+  medicineListFrequency: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
   },
-  doseButtonTaken: {
-    // Additional styling for taken doses
-  },
-  instructionsContainer: {
-    backgroundColor: theme.colors.backgroundAccent,
-    borderRadius: theme.borderRadius.base,
-    padding: theme.spacing.md,
-  },
-  instructionsTitle: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    marginBottom: theme.spacing.xs,
-  },
-  instructionsText: {
-    ...theme.typography.bodySecondary,
-  },
-  
+
   // Modal Styles
   modalContainer: {
     flex: 1,
@@ -641,74 +562,100 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
   modalCancel: {
-    ...theme.typography.body,
+    fontSize: 16,
     color: theme.colors.textSecondary,
   },
   modalTitle: {
-    ...theme.typography.h3,
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
   },
   modalSave: {
-    ...theme.typography.body,
-    color: theme.colors.medicine,
-    fontWeight: theme.typography.fontWeight.semibold,
+    fontSize: 16,
+    color: theme.colors.primary,
+    fontWeight: '600',
   },
   modalContent: {
     flex: 1,
-    padding: theme.spacing.base,
+    padding: 20,
   },
   inputGroup: {
-    marginBottom: theme.spacing.base,
+    marginBottom: 20,
   },
   inputLabel: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    marginBottom: theme.spacing.sm,
+    fontSize: 16,
+    fontWeight: '500',
+    color: theme.colors.text,
+    marginBottom: 8,
   },
   textInput: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    ...theme.typography.body,
+    fontSize: 16,
   },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
+  frequencyButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
-  inputHint: {
-    ...theme.typography.caption,
-    marginTop: theme.spacing.xs,
-    color: theme.colors.textSecondary,
-  },
-  frequencyScroll: {
-    marginTop: theme.spacing.sm,
-  },
-  frequencyChip: {
-    backgroundColor: theme.colors.backgroundSecondary,
-    borderRadius: theme.borderRadius.base,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    marginRight: theme.spacing.sm,
+  frequencyButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    marginRight: 8,
+    marginBottom: 8,
+    backgroundColor: '#FFFFFF',
   },
-  frequencyChipSelected: {
-    backgroundColor: theme.colors.medicine,
-    borderColor: theme.colors.medicine,
+  selectedFrequency: {
+    backgroundColor: theme.colors.strongTeal,
+    borderColor: theme.colors.strongTeal,
   },
-  frequencyChipText: {
-    ...theme.typography.bodySecondary,
+  frequencyText: {
+    fontSize: 14,
+    color: theme.colors.text,
   },
-  frequencyChipTextSelected: {
-    color: theme.colors.textInverse,
-    fontWeight: theme.typography.fontWeight.medium,
+  selectedFrequencyText: {
+    color: '#FFFFFF',
+  },
+
+  // Bottom Navigation
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 10,
+    paddingBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
+  activeNavItem: {
+    // Active state styling
+  },
+  navText: {
+    fontSize: 10,
+    color: theme.colors.textLight,
+    marginTop: 4,
+  },
+  activeNavText: {
+    color: theme.colors.strongTeal,
+    fontWeight: '600',
   },
 });
