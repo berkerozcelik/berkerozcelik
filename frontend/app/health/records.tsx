@@ -1009,6 +1009,17 @@ export default function HealthRecords() {
   );
 }
 
+// Helper function for icon colors
+const getColorForIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'monitor-weight': return '#2196F3';
+    case 'thermostat': return '#FF9800';
+    case 'bedtime': return '#5AACB0';
+    case 'directions-walk': return '#4CAF50';
+    default: return '#666';
+  }
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
