@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Turkish Cancer Care Application backend API with focus on authentication, health records, AI chat integration, appointments and medicine APIs"
+user_problem_statement: "Test the Turkish Cancer Care Application 'Onkom' frontend comprehensively with focus on mobile dimensions (iPhone 12: 390x844). Test authentication flow, role-based dashboards, health records with sleep/steps integration, bottom navigation, AI chat, and mobile UX."
 
 backend:
   - task: "Authentication System"
