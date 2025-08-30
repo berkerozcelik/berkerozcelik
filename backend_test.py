@@ -150,25 +150,43 @@ class BackendTester:
 
         headers = {"Authorization": f"Bearer {self.auth_tokens['hasta']}"}
 
-        # Test creating health records
+        # Test creating health records WITH NEW SLEEP AND STEPS FIELDS
         health_data = [
             {
-                "weight": 75.5,
-                "temperature": 36.8,
+                "weight": 70.5,
+                "temperature": 36.5,
                 "blood_pressure_systolic": 120,
                 "blood_pressure_diastolic": 80,
                 "heart_rate": 72,
+                "sleep_hours": 7,
+                "sleep_minutes": 30,
+                "steps": 8500,
                 "symptoms": ["baş ağrısı", "yorgunluk"],
-                "notes": "Genel durumum iyi, hafif yorgunluk var"
+                "notes": "Genel durumum iyi, 7.5 saat uyudum ve 8500 adım attım"
             },
             {
-                "weight": 75.2,
-                "temperature": 37.1,
-                "blood_pressure_systolic": 125,
-                "blood_pressure_diastolic": 82,
-                "heart_rate": 78,
-                "symptoms": ["hafif ateş"],
-                "notes": "Bugün biraz ateşim var"
+                "weight": 70.2,
+                "temperature": 36.8,
+                "blood_pressure_systolic": 118,
+                "blood_pressure_diastolic": 78,
+                "heart_rate": 75,
+                "sleep_hours": 8,
+                "sleep_minutes": 15,
+                "steps": 12000,
+                "symptoms": ["hafif yorgunluk"],
+                "notes": "İyi uyudum (8 saat 15 dk) ve aktif bir gün geçirdim (12000 adım)"
+            },
+            {
+                "weight": 70.3,
+                "temperature": 36.6,
+                "blood_pressure_systolic": 122,
+                "blood_pressure_diastolic": 81,
+                "heart_rate": 70,
+                "sleep_hours": 6,
+                "sleep_minutes": 45,
+                "steps": 5200,
+                "symptoms": ["uykusuzluk", "halsizlik"],
+                "notes": "Az uyudum (6 saat 45 dk), az hareket ettim (5200 adım)"
             }
         ]
 
