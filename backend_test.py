@@ -893,6 +893,7 @@ class BackendTester:
             # Run all test suites
             await self.test_authentication_system()
             await self.test_health_records_api()
+            await self.test_predictive_analysis_module()  # NEW CRITICAL TEST
             await self.test_ai_chat_integration()
             await self.test_appointments_api()
             await self.test_medicines_api()
