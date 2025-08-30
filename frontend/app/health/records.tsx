@@ -574,7 +574,7 @@ export default function HealthRecords() {
       {/* Animated Content */}
       <Animated.View style={[styles.contentContainer, contentAnimation.animatedStyle]}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Period Selection */}
+        {/* Period Selection - Animated */}
         <View style={styles.periodSelection}>
           <Text style={styles.sectionTitle}>📅 Zaman Aralığı</Text>
           <View style={styles.periodButtons}>
@@ -582,22 +582,27 @@ export default function HealthRecords() {
               { key: '7d', label: '7 Gün' },
               { key: '30d', label: '30 Gün' },
               { key: '90d', label: '90 Gün' }
-            ].map((period) => (
-              <TouchableOpacity
-                key={period.key}
-                style={[
-                  styles.periodButton,
-                  selectedPeriod === period.key && styles.activePeriodButton
-                ]}
-                onPress={() => setSelectedPeriod(period.key)}
+            ].map((period, index) => (
+              <Animated.View 
+                key={period.key} 
+                style={periodButtonsAnimation[index]}
+                entering={SlideInLeft.delay(index * 100)}
               >
-                <Text style={[
-                  styles.periodButtonText,
-                  selectedPeriod === period.key && styles.activePeriodButtonText
-                ]}>
-                  {period.label}
-                </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.periodButton,
+                    selectedPeriod === period.key && styles.activePeriodButton
+                  ]}
+                  onPress={() => setSelectedPeriod(period.key)}
+                >
+                  <Text style={[
+                    styles.periodButtonText,
+                    selectedPeriod === period.key && styles.activePeriodButtonText
+                  ]}>
+                    {period.label}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             ))}
           </View>
         </View>
