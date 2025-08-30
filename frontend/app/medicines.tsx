@@ -1223,7 +1223,7 @@ const styles = StyleSheet.create({
   navText: {
     fontSize: 10,
     color: theme.colors.textLight,
-    marginTime: 4,
+    marginTop: 4,
   },
   activeNavText: {
     color: theme.colors.strongTeal,
