@@ -25,7 +25,23 @@ import {
   ProgressChart,
   ContributionGraph
 } from 'react-native-chart-kit';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideInLeft,
+  SlideInRight,
+  SlideInUp,
+  BounceIn,
+  FlipInEasyX,
+  Layout,
+} from 'react-native-reanimated';
 import { theme } from '../theme';
+import {
+  useChartAnimation,
+  useFadeAnimation,
+  useSlideUpAnimation,
+  useStaggeredAnimation,
+} from '../../utils/animations';
 
 const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width } = Dimensions.get('window');
