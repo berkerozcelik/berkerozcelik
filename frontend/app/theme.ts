@@ -1,33 +1,34 @@
 // Turkish Cancer Care App Theme Configuration
-// Updated based on provided design guidelines with exact color palette
+// Updated based on provided design screenshots - NO PURPLE COLORS
 
 export const theme = {
   colors: {
-    // Primary Colors from New Design Guide - EXACT COLORS
+    // Primary Colors from Screenshots - EXACT COLORS
     primary: '#44A878',        // Ana yeşil renk
     secondary: '#78C8A4',      // Açık yeşil 
     accent: '#5AACB0',         // Teal vurgu
     surface: '#ADBDCD',        // Açık gri yüzeyler için
     
-    // Pastel tonlar - yeni palet
-    pastel1: '#ADBDCD',        // En açık gri-mavi
-    pastel2: '#78C8A4',        // Orta yeşil
-    pastel3: '#5AACB0',        // Teal
-    pastel4: '#44A878',        // Koyu yeşil
+    // Pastel tonlar - screenshot'tan
+    lightBlue: '#B8E6E1',      // Çok açık mavi-yeşil
+    mediumTeal: '#78C8A4',     // Orta teal
+    strongTeal: '#5AACB0',     // Güçlü teal
+    darkGreen: '#44A878',      // Koyu yeşil
     
-    // Status Colors
+    // Status Colors - No purple
     success: '#44A878',        // Başarı için yeşil
     warning: '#FF9800',        // Uyarı için turuncu
     error: '#F44336',          // Hata için kırmızı
     info: '#5AACB0',           // Bilgi için teal
     
-    // Background Colors - Modern ve şık
+    // Background Colors
     background: '#FFFFFF',     // Saf beyaz
-    backgroundSecondary: '#F8F9FA', // Çok açık gri
+    backgroundSecondary: '#F0F8F5', // Çok açık yeşil-gri
     backgroundAccent: '#E8F5E8',    // Çok açık yeşil
     backgroundPastel: '#F0F8F5',    // Pastel arka plan
+    backgroundLight: '#F8FBFA',     // Çok açık arka plan
     
-    // Text Colors - Okunabilirlik odaklı
+    // Text Colors
     text: '#2C3E50',           // Ana metin için koyu mavi-gri
     textSecondary: '#7F8C8D',  // İkincil metin için orta gri
     textLight: '#BDC3C7',      // İpuçları için açık gri
@@ -48,15 +49,19 @@ export const theme = {
     deviceDisconnected: '#F44336', // Bağlantısız cihaz
     devicePending: '#FF9800',      // Beklemede
     
-    // Specific Feature Colors
+    // Specific Feature Colors - NO PURPLE
     health: '#44A878',         // Sağlık yeşili
     appointment: '#5AACB0',    // Randevu teal
     medicine: '#78C8A4',       // İlaç açık yeşil
-    ai: '#6366F1',            // AI indigo
+    ai: '#5AACB0',            // AI teal (was purple)
     nutrition: '#F59E0B',      // Beslenme amber
     exercise: '#EF4444',       // Egzersiz kırmızı
-    sleep: '#8B5CF6',         // Uyku mor
-    steps: '#10B981',         // Adım yeşil
+    sleep: '#5AACB0',         // Uyku teal (was purple)
+    steps: '#44A878',         // Adım yeşil
+    
+    // Medicine interaction warning
+    medicineInteraction: '#FFF4E6', // Açık sarı arka plan
+    medicineInteractionBorder: '#FF9800', // Turuncu kenarlık
   },
   
   typography: {
@@ -78,9 +83,10 @@ export const theme = {
       '3xl': 26,
       '4xl': 30,
       '5xl': 36,
+      '6xl': 42, // Büyük başlıklar için
     },
     
-    // Font Weights - Tasarım rehberinde belirtilen
+    // Font Weights
     fontWeight: {
       light: '300',
       regular: '400',      // Normal Metin Yazı Tipi (Regular)
@@ -97,29 +103,29 @@ export const theme = {
       relaxed: 1.6,
     },
     
-    // Text Styles - Tasarım rehberine uygun
+    // Text Styles
     h1: {
+      fontSize: 36,
+      fontWeight: '700',    // Bold
+      lineHeight: 42,
+      color: '#2C3E50',
+    },
+    h2: {
       fontSize: 30,
       fontWeight: '700',    // Bold
       lineHeight: 36,
       color: '#2C3E50',
     },
-    h2: {
-      fontSize: 26,
-      fontWeight: '700',    // Bold
-      lineHeight: 32,
-      color: '#2C3E50',
-    },
     h3: {
-      fontSize: 22,
+      fontSize: 24,
       fontWeight: '600',    // Medium
-      lineHeight: 28,
+      lineHeight: 30,
       color: '#2C3E50',
     },
     h4: {
-      fontSize: 19,
+      fontSize: 20,
       fontWeight: '500',    // Medium
-      lineHeight: 24,
+      lineHeight: 26,
       color: '#2C3E50',
     },
     body: {
@@ -144,6 +150,13 @@ export const theme = {
       fontSize: 15,
       fontWeight: '600',    // Semibold
       lineHeight: 18,
+    },
+    // Büyük interaktif text için
+    interactive: {
+      fontSize: 18,
+      fontWeight: '600',
+      lineHeight: 24,
+      color: '#2C3E50',
     },
   },
   
@@ -201,11 +214,11 @@ export const theme = {
     },
   },
   
-  // Component specific styles - Güncellenmiş
+  // Component specific styles
   components: {
     button: {
       height: 50,
-      borderRadius: 14,
+      borderRadius: 25, // Daha yuvarlak butonlar
       paddingHorizontal: 24,
       paddingVertical: 14,
     },
@@ -227,6 +240,19 @@ export const theme = {
       backgroundColor: '#F8F9FA',
       borderWidth: 1,
       borderColor: '#E1E8ED',
+    },
+    medicineCard: {
+      borderRadius: 12,
+      padding: 16,
+      backgroundColor: '#F0F8F5',
+      marginBottom: 12,
+    },
+    interactionWarning: {
+      borderRadius: 12,
+      padding: 16,
+      backgroundColor: '#FFF4E6',
+      borderWidth: 1,
+      borderColor: '#FF9800',
     },
   },
 };
