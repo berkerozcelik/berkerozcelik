@@ -109,7 +109,152 @@ export default function Medicines() {
 
   useEffect(() => {
     fetchMedicines();
+    initializeNotifications();
+    
+    // Notification listeners
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Bildirim alındı:', notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+      if (data.type === 'medicine_reminder') {
+        handleNotificationResponse(data.medicineId, data.medicineName);
+      }
+    });
+
+    return () => {
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
+    };
   }, []);
+
+  const initializeNotifications = async () => {
+    try {
+      const token = await notificationService.registerForPushNotificationsAsync();
+      if (token) {
+        setNotificationToken(token);
+        setNotificationsEnabled(true);
+        
+        // Load existing notification settings
+        const savedSettings = await AsyncStorage.getItem('notification_settings');
+        if (savedSettings) {
+          const settings = JSON.parse(savedSettings);
+          setNotificationsEnabled(settings.enabled || false);
+        }
+        
+        // Setup existing medicine reminders
+        await setupMedicineReminders();
+      }
+    } catch (error) {
+      console.error('Bildirim başlatma hatası:', error);
+    }
+  };
+
+  const setupMedicineReminders = async () => {
+    try {
+      const medicineReminders: MedicineReminder[] = dailyMedicines
+        .filter(medicine => medicine.notifications_enabled && medicine.time)
+        .map(medicine => ({
+          medicineId: medicine.id,
+          medicineName: medicine.name,
+          dosage: '',
+          time: medicine.time,
+          frequency: 'daily',
+          isActive: true
+        }));
+
+      await notificationService.scheduleAllMedicineReminders(medicineReminders);
+      
+      // Setup weekly report
+      await generateWeeklyMedicineReport(medicineReminders);
+    } catch (error) {
+      console.error('İlaç hatırlatmaları ayarlanırken hata:', error);
+    }
+  };
+
+  const handleNotificationResponse = (medicineId: string, medicineName: string) => {
+    Alert.alert(
+      '💊 İlaç Hatırlatması',
+      `${medicineName} almanızın zamanı geldi. İlacınızı aldınız mı?`,
+      [
+        {
+          text: 'Daha Sonra',
+          onPress: () => scheduleRemindLater(medicineId, medicineName),
+          style: 'cancel'
+        },
+        {
+          text: 'Aldım',
+          onPress: () => markMedicineAsTaken(medicineId, medicineName)
+        }
+      ]
+    );
+  };
+
+  const scheduleRemindLater = async (medicineId: string, medicineName: string) => {
+    try {
+      await notificationService.scheduleMissedMedicineReminder(medicineId, medicineName);
+      
+      // Update missed count
+      setDailyMedicines(prev => 
+        prev.map(medicine => 
+          medicine.id === medicineId 
+            ? { ...medicine, missed_count: (medicine.missed_count || 0) + 1 }
+            : medicine
+        )
+      );
+      
+      Alert.alert('Bilgi', '30 dakika sonra tekrar hatırlatılacaksınız.');
+    } catch (error) {
+      console.error('Erteleme hatırlatması ayarlanırken hata:', error);
+    }
+  };
+
+  const markMedicineAsTaken = async (medicineId: string, medicineName: string) => {
+    try {
+      await notificationService.sendMedicineTakenConfirmation(medicineName);
+      
+      setDailyMedicines(prev => 
+        prev.map(medicine => 
+          medicine.id === medicineId 
+            ? { 
+                ...medicine, 
+                taken: true, 
+                last_taken: new Date().toISOString(),
+                missed_count: 0
+              }
+            : medicine
+        )
+      );
+    } catch (error) {
+      console.error('İlaç alındı işareti konulurken hata:', error);
+    }
+  };
+
+  const toggleNotifications = async (enabled: boolean) => {
+    try {
+      setNotificationsEnabled(enabled);
+      
+      await AsyncStorage.setItem('notification_settings', JSON.stringify({
+        enabled: enabled
+      }));
+
+      if (enabled) {
+        await setupMedicineReminders();
+        Alert.alert('Başarılı', 'İlaç hatırlatmaları açıldı');
+      } else {
+        await notificationService.cancelAllMedicineReminders();
+        Alert.alert('Başarılı', 'İlaç hatırlatmaları kapatıldı');
+      }
+    } catch (error) {
+      console.error('Bildirim ayarı değiştirilirken hata:', error);
+      Alert.alert('Hata', 'Bildirim ayarı değiştirilemedi');
+    }
+  };
 
   const fetchMedicines = async () => {
     try {
