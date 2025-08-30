@@ -42,5 +42,3 @@ export default function RootLayout() {
     </>
   );
 }
-</absolute_file_name>
-    </file>
