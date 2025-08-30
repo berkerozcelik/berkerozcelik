@@ -310,6 +310,8 @@ export default function Medicines() {
   const handleHideNotificationModal = () => {
     hideNotificationModalAnim(() => setShowNotificationModal(false));
   };
+
+  const toggleNotifications = async (enabled: boolean) => {
     try {
       setNotificationsEnabled(enabled);
       
