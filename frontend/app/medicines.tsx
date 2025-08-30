@@ -756,7 +756,8 @@ export default function Medicines() {
               </Text>
             </View>
           </ScrollView>
-        </SafeAreaView>
+          </Animated.View>
+        </Animated.View>
       </Modal>
 
       {/* AI Interaction Modal */}
