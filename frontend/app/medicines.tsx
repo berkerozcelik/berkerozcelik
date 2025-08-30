@@ -760,41 +760,46 @@ export default function Medicines() {
         </Animated.View>
       </Modal>
 
-      {/* AI Interaction Modal */}
+      {/* AI Interaction Modal - Animated */}
       <Modal
         visible={showAIModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        transparent={true}
+        animationType="none"
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowAIModal(false)}>
-              <Text style={styles.modalCancel}>Kapat</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>İlaç Etkileşim Analizi</Text>
-            <View style={styles.placeholder} />
-          </View>
-          
-          <ScrollView style={styles.modalContent}>
-            {aiLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={theme.colors.primary} />
-                <Text style={styles.loadingText}>AI analiz yapıyor...</Text>
-              </View>
-            ) : (
-              <Text style={styles.aiResponseText}>{aiResponse}</Text>
-            )}
-          </ScrollView>
-        </SafeAreaView>
+        <Animated.View style={[styles.modalBackdrop, aiModalStyle]}>
+          <Animated.View style={[styles.modalContainer, aiModalStyle]}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={handleHideAIModal}>
+                <Text style={styles.modalCancel}>Kapat</Text>
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>İlaç Etkileşim Analizi</Text>
+              <View style={styles.placeholder} />
+            </View>
+            
+            <ScrollView style={styles.modalContent}>
+              {aiLoading ? (
+                <Animated.View style={styles.loadingContainer} entering={FadeIn}>
+                  <ActivityIndicator size="large" color={theme.colors.primary} />
+                  <Text style={styles.loadingText}>AI analiz yapıyor...</Text>
+                </Animated.View>
+              ) : (
+                <Animated.Text style={styles.aiResponseText} entering={SlideInUp.delay(300)}>
+                  {aiResponse}
+                </Animated.Text>
+              )}
+            </ScrollView>
+          </Animated.View>
+        </Animated.View>
       </Modal>
 
-      {/* Notification Settings Modal */}
+      {/* Notification Settings Modal - Animated */}
       <Modal
         visible={showNotificationModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        transparent={true}
+        animationType="none"
       >
-        <SafeAreaView style={styles.modalContainer}>
+        <Animated.View style={[styles.modalBackdrop, notificationModalStyle]}>
+          <Animated.View style={[styles.modalContainer, notificationModalStyle]}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowNotificationModal(false)}>
               <Text style={styles.modalCancel}>Kapat</Text>
