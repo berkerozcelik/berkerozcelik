@@ -119,15 +119,18 @@ backend:
 
   - task: "Health Records API"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: true
           agent: "testing"
           comment: "✅ Health records API fully functional. Successfully creates health records with weight, temperature, blood pressure, heart rate, symptoms in Turkish. Retrieval of all records and latest health data working correctly. Created demo data with realistic Turkish medical terms."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE: Backend models missing NEW REQUIRED FIELDS. Health Records API does not include sleep_hours, sleep_minutes, and steps fields as requested. Current HealthRecord model only has: weight, temperature, blood_pressure_systolic, blood_pressure_diastolic, heart_rate, symptoms, notes. The new sleep and steps tracking fields are completely missing from backend implementation. Frontend expects these fields but backend cannot provide them."
 
   - task: "AI Chat Integration"
     implemented: true
