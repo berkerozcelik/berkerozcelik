@@ -540,18 +540,29 @@ export default function Medicines() {
       {/* Animated Content */}
       <Animated.View style={[styles.contentContainer, contentAnimation.animatedStyle]}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Today's Medicines */}
+        {/* Today's Medicines - Animated */}
         <View style={styles.todaySection}>
           <Text style={styles.sectionTitle}>Bugün</Text>
           
-          {dailyMedicines.map((medicine) => (
-            <View key={medicine.id} style={styles.medicineCard}>
-              <View style={styles.medicineContent}>
+          {dailyMedicines.map((medicine, index) => (
+            <Animated.View 
+              key={medicine.id} 
+              style={[styles.medicineCard, medicineCardsAnimation[index]]}
+              entering={BounceIn.delay(index * 150)}
+              layout={Layout.springify()}
+            >
+              <TouchableOpacity
+                style={styles.medicineContent}
+                onPress={() => toggleMedicineTaken(medicine.id)}
+                activeOpacity={0.7}
+              >
                 <View style={styles.medicineInfo}>
                   <View style={styles.medicineNameRow}>
                     <Text style={styles.medicineName}>{medicine.name}</Text>
                     {medicine.notifications_enabled && notificationsEnabled && (
-                      <MaterialIcons name="notifications" size={16} color={theme.colors.strongTeal} />
+                      <Animated.View entering={FadeIn.delay(500)}>
+                        <MaterialIcons name="notifications" size={16} color={theme.colors.strongTeal} />
+                      </Animated.View>
                     )}
                   </View>
                   <View style={styles.medicineDetails}>
@@ -559,30 +570,45 @@ export default function Medicines() {
                       <Text style={styles.medicineTime}>⏰ {medicine.time}</Text>
                     )}
                     {medicine.missed_count > 0 && (
-                      <Text style={styles.missedCount}>❌ {medicine.missed_count} kaçırıldı</Text>
+                      <Animated.Text 
+                        style={styles.missedCount}
+                        entering={SlideInUp}
+                      >
+                        ❌ {medicine.missed_count} kaçırıldı
+                      </Animated.Text>
                     )}
                     {medicine.last_taken && (
-                      <Text style={styles.lastTaken}>
+                      <Animated.Text 
+                        style={styles.lastTaken}
+                        entering={FadeIn.delay(300)}
+                      >
                         ✅ Son: {new Date(medicine.last_taken).toLocaleTimeString('tr-TR', { 
                           hour: '2-digit', 
                           minute: '2-digit' 
                         })}
-                      </Text>
+                      </Animated.Text>
                     )}
                   </View>
                 </View>
-                <TouchableOpacity 
-                  style={medicine.taken ? styles.checkboxChecked : styles.checkboxEmpty}
-                  onPress={() => toggleMedicineTaken(medicine.id)}
-                >
-                  <MaterialIcons 
-                    name={medicine.taken ? "check-box" : "check-box-outline-blank"} 
-                    size={24} 
-                    color={medicine.taken ? theme.colors.success : theme.colors.textLight} 
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+                <Animated.View style={animatedPulseStyle}>
+                  <TouchableOpacity 
+                    style={medicine.taken ? styles.checkboxChecked : styles.checkboxEmpty}
+                    onPress={() => toggleMedicineTaken(medicine.id)}
+                  >
+                    <MaterialIcons 
+                      name={medicine.taken ? "check-box" : "check-box-outline-blank"} 
+                      size={24} 
+                      color={medicine.taken ? theme.colors.success : theme.colors.textLight} 
+                    />
+                  </TouchableOpacity>
+                </Animated.View>
+              </TouchableOpacity>
+              
+              {/* Success Animation Overlay */}
+              <Animated.View style={[styles.successOverlay, animatedSuccessStyle]}>
+                <MaterialIcons name="check-circle" size={60} color={theme.colors.success} />
+              </Animated.View>
+            </Animated.View>
           ))}
         </View>
 
