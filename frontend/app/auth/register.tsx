@@ -18,7 +18,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 
 const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -40,6 +39,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showRolePicker, setShowRolePicker] = useState(false);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -120,6 +120,16 @@ export default function Register() {
     }));
   };
 
+  const getRoleLabel = (value: string) => {
+    const role = userRoles.find(r => r.value === value);
+    return role ? role.label : value;
+  };
+
+  const selectRole = (role: any) => {
+    updateFormData('role', role.value);
+    setShowRolePicker(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#4CAF50" barStyle="light-content" />
@@ -184,22 +194,38 @@ export default function Register() {
               />
             </View>
 
-            <View style={styles.inputContainer}>
+            <TouchableOpacity
+              style={styles.inputContainer}
+              onPress={() => setShowRolePicker(!showRolePicker)}
+            >
               <MaterialIcons name="badge" size={20} color="#666" style={styles.inputIcon} />
-              <Picker
-                selectedValue={formData.role}
-                onValueChange={(value) => updateFormData('role', value)}
-                style={styles.picker}
-              >
+              <Text style={[styles.textInput, { paddingVertical: 12 }]}>
+                {getRoleLabel(formData.role)}
+              </Text>
+              <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
+            </TouchableOpacity>
+
+            {showRolePicker && (
+              <View style={styles.pickerContainer}>
                 {userRoles.map((role) => (
-                  <Picker.Item
+                  <TouchableOpacity
                     key={role.value}
-                    label={role.label}
-                    value={role.value}
-                  />
+                    style={[
+                      styles.pickerItem,
+                      formData.role === role.value && styles.selectedPickerItem
+                    ]}
+                    onPress={() => selectRole(role)}
+                  >
+                    <Text style={[
+                      styles.pickerItemText,
+                      formData.role === role.value && styles.selectedPickerItemText
+                    ]}>
+                      {role.label}
+                    </Text>
+                  </TouchableOpacity>
                 ))}
-              </Picker>
-            </View>
+              </View>
+            )}
 
             <View style={styles.inputContainer}>
               <MaterialIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
@@ -352,9 +378,33 @@ const styles = StyleSheet.create({
     color: '#333',
     paddingVertical: 4,
   },
-  picker: {
-    flex: 1,
+  pickerContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  pickerItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  selectedPickerItem: {
+    backgroundColor: '#E8F5E8',
+  },
+  pickerItemText: {
+    fontSize: 16,
     color: '#333',
+  },
+  selectedPickerItemText: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
   },
   eyeButton: {
     padding: 4,
