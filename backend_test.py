@@ -26,6 +26,7 @@ class BackendTester:
         self.test_results = {
             'authentication': {'passed': 0, 'failed': 0, 'details': []},
             'health_records': {'passed': 0, 'failed': 0, 'details': []},
+            'predictive_analysis': {'passed': 0, 'failed': 0, 'details': []},
             'ai_chat': {'passed': 0, 'failed': 0, 'details': []},
             'appointments': {'passed': 0, 'failed': 0, 'details': []},
             'medicines': {'passed': 0, 'failed': 0, 'details': []}
