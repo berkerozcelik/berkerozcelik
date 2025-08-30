@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
+import { theme } from './theme';
 
 const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -90,7 +91,7 @@ export default function Index() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#4CAF50" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Yükleniyor...</Text>
       </View>
     );
@@ -99,10 +100,10 @@ export default function Index() {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar backgroundColor="#4CAF50" barStyle="light-content" />
+        <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
         
         <View style={styles.header}>
-          <MaterialIcons name="health-and-safety" size={60} color="#fff" />
+          <MaterialIcons name="health-and-safety" size={60} color={theme.colors.textInverse} />
           <Text style={styles.appTitle}>Kanser Bakım</Text>
           <Text style={styles.appSubtitle}>Sağlığınız bizim önceliğimiz</Text>
         </View>
@@ -122,7 +123,7 @@ export default function Index() {
               style={styles.primaryButton}
               onPress={() => navigateToScreen('auth/login')}
             >
-              <MaterialIcons name="login" size={24} color="#fff" />
+              <MaterialIcons name="login" size={20} color={theme.colors.textInverse} />
               <Text style={styles.primaryButtonText}>Giriş Yap</Text>
             </TouchableOpacity>
 
@@ -130,7 +131,7 @@ export default function Index() {
               style={styles.secondaryButton}
               onPress={() => navigateToScreen('auth/register')}
             >
-              <MaterialIcons name="person-add" size={24} color="#4CAF50" />
+              <MaterialIcons name="person-add" size={20} color={theme.colors.primary} />
               <Text style={styles.secondaryButtonText}>Kayıt Ol</Text>
             </TouchableOpacity>
           </View>
@@ -139,7 +140,7 @@ export default function Index() {
             <Text style={styles.featuresTitle}>Özellikler</Text>
             
             <View style={styles.featureItem}>
-              <MaterialIcons name="monitor-heart" size={32} color="#4CAF50" />
+              <MaterialIcons name="monitor-heart" size={28} color={theme.colors.primary} />
               <View style={styles.featureText}>
                 <Text style={styles.featureTitle}>Sağlık Takibi</Text>
                 <Text style={styles.featureDescription}>
@@ -149,7 +150,7 @@ export default function Index() {
             </View>
 
             <View style={styles.featureItem}>
-              <MaterialIcons name="calendar-today" size={32} color="#4CAF50" />
+              <MaterialIcons name="calendar-today" size={28} color={theme.colors.secondary} />
               <View style={styles.featureText}>
                 <Text style={styles.featureTitle}>Randevu Yönetimi</Text>
                 <Text style={styles.featureDescription}>
@@ -159,7 +160,7 @@ export default function Index() {
             </View>
 
             <View style={styles.featureItem}>
-              <MaterialIcons name="medication" size={32} color="#4CAF50" />
+              <MaterialIcons name="medication" size={28} color={theme.colors.accent} />
               <View style={styles.featureText}>
                 <Text style={styles.featureTitle}>İlaç Takibi</Text>
                 <Text style={styles.featureDescription}>
@@ -169,7 +170,7 @@ export default function Index() {
             </View>
 
             <View style={styles.featureItem}>
-              <MaterialIcons name="psychology" size={32} color="#4CAF50" />
+              <MaterialIcons name="psychology" size={28} color={theme.colors.info} />
               <View style={styles.featureText}>
                 <Text style={styles.featureTitle}>AI Asistan</Text>
                 <Text style={styles.featureDescription}>
@@ -186,7 +187,7 @@ export default function Index() {
   // Dashboard for logged-in users
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#4CAF50" barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
       
       <View style={styles.header}>
         <View>
@@ -197,7 +198,7 @@ export default function Index() {
           </Text>
         </View>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <MaterialIcons name="logout" size={24} color="#fff" />
+          <MaterialIcons name="logout" size={24} color={theme.colors.textInverse} />
         </TouchableOpacity>
       </View>
 
@@ -208,19 +209,19 @@ export default function Index() {
           {latestHealth ? (
             <View style={styles.healthData}>
               <View style={styles.healthItem}>
-                <MaterialIcons name="monitor-weight" size={20} color="#4CAF50" />
+                <MaterialIcons name="monitor-weight" size={20} color={theme.colors.primary} />
                 <Text style={styles.healthValue}>
                   {latestHealth.weight ? `${latestHealth.weight} kg` : 'Kayıt yok'}
                 </Text>
               </View>
               <View style={styles.healthItem}>
-                <MaterialIcons name="thermostat" size={20} color="#FF5722" />
+                <MaterialIcons name="thermostat" size={20} color={theme.colors.warning} />
                 <Text style={styles.healthValue}>
                   {latestHealth.temperature ? `${latestHealth.temperature}°C` : 'Kayıt yok'}
                 </Text>
               </View>
               <View style={styles.healthItem}>
-                <MaterialIcons name="favorite" size={20} color="#E91E63" />
+                <MaterialIcons name="favorite" size={20} color={theme.colors.error} />
                 <Text style={styles.healthValue}>
                   {latestHealth.blood_pressure_systolic ? 
                     `${latestHealth.blood_pressure_systolic}/${latestHealth.blood_pressure_diastolic}` : 
@@ -242,7 +243,7 @@ export default function Index() {
               style={styles.actionButton}
               onPress={() => navigateToScreen('health/records')}
             >
-              <MaterialIcons name="monitor-heart" size={32} color="#4CAF50" />
+              <MaterialIcons name="monitor-heart" size={28} color={theme.colors.primary} />
               <Text style={styles.actionText}>Sağlık Verileri</Text>
             </TouchableOpacity>
 
@@ -250,7 +251,7 @@ export default function Index() {
               style={styles.actionButton}
               onPress={() => navigateToScreen('appointments')}
             >
-              <MaterialIcons name="calendar-today" size={32} color="#2196F3" />
+              <MaterialIcons name="calendar-today" size={28} color={theme.colors.info} />
               <Text style={styles.actionText}>Randevular</Text>
             </TouchableOpacity>
 
@@ -258,7 +259,7 @@ export default function Index() {
               style={styles.actionButton}
               onPress={() => navigateToScreen('medicines')}
             >
-              <MaterialIcons name="medication" size={32} color="#FF9800" />
+              <MaterialIcons name="medication" size={28} color={theme.colors.warning} />
               <Text style={styles.actionText}>İlaçlar</Text>
             </TouchableOpacity>
 
@@ -266,7 +267,7 @@ export default function Index() {
               style={styles.actionButton}
               onPress={() => navigateToScreen('ai-chat')}
             >
-              <MaterialIcons name="psychology" size={32} color="#9C27B0" />
+              <MaterialIcons name="psychology" size={28} color={theme.colors.secondary} />
               <Text style={styles.actionText}>AI Asistan</Text>
             </TouchableOpacity>
 
@@ -274,7 +275,7 @@ export default function Index() {
               style={styles.actionButton}
               onPress={() => navigateToScreen('nutrition')}
             >
-              <MaterialIcons name="restaurant" size={32} color="#4CAF50" />
+              <MaterialIcons name="restaurant" size={28} color={theme.colors.accent} />
               <Text style={styles.actionText}>Beslenme</Text>
             </TouchableOpacity>
 
@@ -282,7 +283,7 @@ export default function Index() {
               style={styles.actionButton}
               onPress={() => navigateToScreen('exercise')}
             >
-              <MaterialIcons name="fitness-center" size={32} color="#FF5722" />
+              <MaterialIcons name="fitness-center" size={28} color={theme.colors.success} />
               <Text style={styles.actionText}>Egzersiz</Text>
             </TouchableOpacity>
           </View>
@@ -295,163 +296,141 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.colors.backgroundSecondary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.colors.backgroundSecondary,
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#666',
+    marginTop: theme.spacing.base,
+    ...theme.typography.body,
+    color: theme.colors.textSecondary,
   },
   header: {
-    backgroundColor: '#4CAF50',
-    padding: 20,
-    paddingTop: 40,
+    backgroundColor: theme.colors.primary,
+    padding: theme.spacing.xl,
+    paddingTop: theme.spacing['4xl'],
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   appTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 8,
+    ...theme.typography.h1,
+    color: theme.colors.textInverse,
+    marginTop: theme.spacing.sm,
   },
   appSubtitle: {
-    fontSize: 14,
-    color: '#E8F5E8',
-    marginTop: 4,
+    ...theme.typography.bodySecondary,
+    color: theme.colors.textInverse,
+    opacity: 0.9,
+    marginTop: theme.spacing.xs,
   },
   greeting: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    ...theme.typography.h3,
+    color: theme.colors.textInverse,
   },
   roleText: {
-    fontSize: 14,
-    color: '#E8F5E8',
-    marginTop: 2,
+    ...theme.typography.bodySecondary,
+    color: theme.colors.textInverse,
+    opacity: 0.9,
+    marginTop: theme.spacing.xs,
   },
   logoutButton: {
-    padding: 8,
+    padding: theme.spacing.sm,
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: theme.spacing.base,
   },
   welcomeSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 24,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: theme.colors.cardBackground,
+    padding: theme.spacing.xl,
+    borderRadius: theme.borderRadius.lg,
+    marginBottom: theme.spacing.xl,
+    ...theme.shadows.base,
   },
   welcomeTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+    ...theme.typography.h2,
+    marginBottom: theme.spacing.md,
   },
   welcomeText: {
-    fontSize: 16,
-    color: '#666',
+    ...theme.typography.body,
+    color: theme.colors.textSecondary,
     lineHeight: 24,
   },
   authButtons: {
-    marginBottom: 32,
+    marginBottom: theme.spacing['2xl'],
   },
   primaryButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    elevation: 2,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.lg,
+    marginBottom: theme.spacing.md,
+    ...theme.shadows.base,
   },
   primaryButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 8,
+    ...theme.typography.button,
+    color: theme.colors.textInverse,
+    marginLeft: theme.spacing.sm,
   },
   secondaryButton: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.cardBackground,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.lg,
     borderWidth: 2,
-    borderColor: '#4CAF50',
+    borderColor: theme.colors.primary,
+    ...theme.shadows.sm,
   },
   secondaryButtonText: {
-    color: '#4CAF50',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 8,
+    ...theme.typography.button,
+    color: theme.colors.primary,
+    marginLeft: theme.spacing.sm,
   },
   featuresSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: theme.colors.cardBackground,
+    padding: theme.spacing.xl,
+    borderRadius: theme.borderRadius.lg,
+    ...theme.shadows.base,
   },
   featuresTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
+    ...theme.typography.h3,
+    marginBottom: theme.spacing.base,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: theme.spacing.base,
   },
   featureText: {
-    marginLeft: 16,
+    marginLeft: theme.spacing.base,
     flex: 1,
   },
   featureTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    ...theme.typography.h4,
   },
   featureDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+    ...theme.typography.bodySecondary,
+    marginTop: theme.spacing.xs,
   },
   summaryCard: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: theme.colors.cardBackground,
+    padding: theme.spacing.xl,
+    borderRadius: theme.borderRadius.lg,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.base,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+    ...theme.typography.h4,
+    marginBottom: theme.spacing.md,
   },
   healthData: {
     flexDirection: 'row',
@@ -461,24 +440,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   healthValue: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
+    ...theme.typography.caption,
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
+    textAlign: 'center',
   },
   noDataText: {
-    fontSize: 14,
-    color: '#999',
+    ...theme.typography.bodySecondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
   quickActions: {
-    marginBottom: 20,
+    marginBottom: theme.spacing.lg,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
+    ...theme.typography.h3,
+    marginBottom: theme.spacing.base,
   },
   actionGrid: {
     flexDirection: 'row',
@@ -486,24 +463,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   actionButton: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.cardBackground,
     width: '48%',
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderRadius: theme.borderRadius.lg,
+    marginBottom: theme.spacing.md,
+    ...theme.shadows.base,
   },
   actionText: {
-    fontSize: 12,
-    color: '#333',
-    fontWeight: '600',
-    marginTop: 8,
+    ...theme.typography.caption,
+    fontWeight: theme.typography.fontWeight.medium,
+    marginTop: theme.spacing.sm,
     textAlign: 'center',
   },
 });

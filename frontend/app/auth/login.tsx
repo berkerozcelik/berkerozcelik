@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
+import { theme } from '../theme';
 
 const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -78,7 +79,7 @@ export default function Login() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#4CAF50" barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
       
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -90,25 +91,25 @@ export default function Login() {
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <MaterialIcons name="arrow-back" size={24} color="#fff" />
+              <MaterialIcons name="arrow-back" size={24} color={theme.colors.textInverse} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Giriş Yap</Text>
           </View>
 
           <View style={styles.content}>
             <View style={styles.logoSection}>
-              <MaterialIcons name="health-and-safety" size={80} color="#4CAF50" />
+              <MaterialIcons name="health-and-safety" size={80} color={theme.colors.primary} />
               <Text style={styles.appName}>Kanser Bakım</Text>
               <Text style={styles.welcomeText}>Hesabınıza giriş yapın</Text>
             </View>
 
             <View style={styles.formSection}>
               <View style={styles.inputContainer}>
-                <MaterialIcons name="email" size={20} color="#666" style={styles.inputIcon} />
+                <MaterialIcons name="email" size={20} color={theme.colors.textSecondary} style={styles.inputIcon} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="E-posta adresi"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={theme.colors.textLight}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -118,11 +119,11 @@ export default function Login() {
               </View>
 
               <View style={styles.inputContainer}>
-                <MaterialIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
+                <MaterialIcons name="lock" size={20} color={theme.colors.textSecondary} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.textInput, { flex: 1 }]}
                   placeholder="Şifre"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={theme.colors.textLight}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -135,7 +136,7 @@ export default function Login() {
                   <MaterialIcons
                     name={showPassword ? 'visibility' : 'visibility-off'}
                     size={20}
-                    color="#666"
+                    color={theme.colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -146,10 +147,10 @@ export default function Login() {
                 disabled={loading}
               >
                 {loading ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={theme.colors.textInverse} />
                 ) : (
                   <>
-                    <MaterialIcons name="login" size={20} color="#fff" />
+                    <MaterialIcons name="login" size={20} color={theme.colors.textInverse} />
                     <Text style={styles.loginButtonText}>Giriş Yap</Text>
                   </>
                 )}
@@ -180,7 +181,7 @@ export default function Login() {
                   setPassword('demo123');
                 }}
               >
-                <MaterialIcons name="person" size={16} color="#4CAF50" />
+                <MaterialIcons name="person" size={16} color={theme.colors.primary} />
                 <Text style={styles.demoButtonText}>Hasta Hesabı</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -190,8 +191,18 @@ export default function Login() {
                   setPassword('demo123');
                 }}
               >
-                <MaterialIcons name="medical-services" size={16} color="#4CAF50" />
+                <MaterialIcons name="medical-services" size={16} color={theme.colors.secondary} />
                 <Text style={styles.demoButtonText}>Doktor Hesabı</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.demoButton}
+                onPress={() => {
+                  setEmail('bakici@demo.com');
+                  setPassword('demo123');
+                }}
+              >
+                <MaterialIcons name="elderly" size={16} color={theme.colors.accent} />
+                <Text style={styles.demoButtonText}>Bakıcı Hesabı</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -204,161 +215,141 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.colors.backgroundSecondary,
   },
   keyboardContainer: {
     flex: 1,
   },
   header: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingTop: 40,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.md,
+    paddingTop: theme.spacing['4xl'],
   },
   backButton: {
-    padding: 8,
-    marginRight: 8,
+    padding: theme.spacing.sm,
+    marginRight: theme.spacing.sm,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    ...theme.typography.h3,
+    color: theme.colors.textInverse,
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: theme.spacing.xl,
   },
   logoSection: {
     alignItems: 'center',
-    marginBottom: 40,
-    marginTop: 20,
+    marginBottom: theme.spacing['4xl'],
+    marginTop: theme.spacing.xl,
   },
   appName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
+    ...theme.typography.h1,
+    marginTop: theme.spacing.base,
   },
   welcomeText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 8,
+    ...theme.typography.body,
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.sm,
   },
   formSection: {
-    marginBottom: 32,
+    marginBottom: theme.spacing['2xl'],
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 16,
+    backgroundColor: theme.colors.cardBackground,
+    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.md,
+    marginBottom: theme.spacing.base,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    borderColor: theme.colors.border,
+    ...theme.shadows.sm,
   },
   inputIcon: {
-    marginRight: 12,
+    marginRight: theme.spacing.md,
   },
   textInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#333',
-    paddingVertical: 4,
+    ...theme.typography.body,
+    paddingVertical: theme.spacing.xs,
   },
   eyeButton: {
-    padding: 4,
+    padding: theme.spacing.xs,
   },
   loginButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 8,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.lg,
+    marginTop: theme.spacing.sm,
+    ...theme.shadows.base,
   },
   disabledButton: {
-    backgroundColor: '#a5a5a5',
+    backgroundColor: theme.colors.textLight,
   },
   loginButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 8,
+    ...theme.typography.button,
+    color: theme.colors.textInverse,
+    marginLeft: theme.spacing.sm,
   },
   linkButton: {
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: theme.spacing.base,
   },
   linkText: {
-    color: '#4CAF50',
-    fontSize: 14,
-    fontWeight: '600',
+    ...theme.typography.bodySecondary,
+    color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.medium,
   },
   registerSection: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: theme.spacing.xl,
   },
   registerPrompt: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    ...theme.typography.bodySecondary,
+    marginBottom: theme.spacing.sm,
   },
   registerButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
   },
   registerButtonText: {
-    color: '#4CAF50',
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...theme.typography.body,
+    color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   demoSection: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    backgroundColor: theme.colors.cardBackground,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.lg,
+    ...theme.shadows.sm,
   },
   demoTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+    ...theme.typography.bodySecondary,
+    fontWeight: theme.typography.fontWeight.semibold,
+    marginBottom: theme.spacing.md,
     textAlign: 'center',
   },
   demoButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f8f8',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 8,
+    backgroundColor: theme.colors.backgroundAccent,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.base,
+    marginBottom: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: '#4CAF50',
+    borderColor: theme.colors.borderLight,
   },
   demoButtonText: {
-    color: '#4CAF50',
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 6,
+    ...theme.typography.caption,
+    fontWeight: theme.typography.fontWeight.medium,
+    marginLeft: theme.spacing.xs,
   },
 });
