@@ -688,37 +688,28 @@ export default function HealthRecords() {
           </View>
         </View>
 
-        {/* Summary Cards - Enhanced */}
+        {/* Summary Cards - Enhanced & Animated */}
         <View style={styles.enhancedSummaryContainer}>
           <Text style={styles.sectionTitle}>📋 Güncel Değerler</Text>
           <View style={styles.summaryGrid}>
-            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#E3F2FD' }]}>
-              <MaterialIcons name="monitor-weight" size={28} color="#2196F3" />
-              <Text style={styles.enhancedSummaryValue}>68,5 kg</Text>
-              <Text style={styles.enhancedSummaryLabel}>Son Kilo</Text>
-              <Text style={styles.summaryTrend}>📉 -0.2kg</Text>
-            </View>
-            
-            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#FFF3E0' }]}>
-              <MaterialIcons name="thermostat" size={28} color="#FF9800" />
-              <Text style={styles.enhancedSummaryValue}>36,5°C</Text>
-              <Text style={styles.enhancedSummaryLabel}>Son Ateş</Text>
-              <Text style={styles.summaryTrend}>✅ Normal</Text>
-            </View>
-            
-            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#E0F2F1' }]}>
-              <MaterialIcons name="bedtime" size={28} color="#5AACB0" />
-              <Text style={styles.enhancedSummaryValue}>7,3s</Text>
-              <Text style={styles.enhancedSummaryLabel}>Son Uyku</Text>
-              <Text style={styles.summaryTrend}>🌟 İyi</Text>
-            </View>
-            
-            <View style={[styles.enhancedSummaryCard, { backgroundColor: '#E8F5E8' }]}>
-              <MaterialIcons name="directions-walk" size={28} color="#4CAF50" />
-              <Text style={styles.enhancedSummaryValue}>6.542</Text>
-              <Text style={styles.enhancedSummaryLabel}>Son Adım</Text>
-              <Text style={styles.summaryTrend}>🎯 82%</Text>
-            </View>
+            {[
+              { icon: 'monitor-weight', value: '68,5 kg', label: 'Son Kilo', trend: '📉 -0.2kg', color: '#E3F2FD' },
+              { icon: 'thermostat', value: '36,5°C', label: 'Son Ateş', trend: '✅ Normal', color: '#FFF3E0' },
+              { icon: 'bedtime', value: '7,3s', label: 'Son Uyku', trend: '🌟 İyi', color: '#E0F2F1' },
+              { icon: 'directions-walk', value: '6.542', label: 'Son Adım', trend: '🎯 82%', color: '#E8F5E8' }
+            ].map((item, index) => (
+              <Animated.View 
+                key={item.label}
+                style={[styles.enhancedSummaryCard, { backgroundColor: item.color }, summaryCardsAnimation[index]]}
+                entering={BounceIn.delay(index * 200)}
+                layout={Layout.springify()}
+              >
+                <MaterialIcons name={item.icon as any} size={28} color={getColorForIcon(item.icon)} />
+                <Text style={styles.enhancedSummaryValue}>{item.value}</Text>
+                <Text style={styles.enhancedSummaryLabel}>{item.label}</Text>
+                <Text style={styles.summaryTrend}>{item.trend}</Text>
+              </Animated.View>
+            ))}
           </View>
         </View>
             <MaterialIcons name="bedtime" size={32} color={theme.colors.strongTeal} />
