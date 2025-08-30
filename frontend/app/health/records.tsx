@@ -1060,6 +1060,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.backgroundLight,
   },
+  contentContainer: {
+    flex: 1,
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
