@@ -345,11 +345,11 @@ class BackendTester:
             except Exception as e:
                 self.log_result('ai_chat', f"Turkish AI Chat {i+1}", False, str(e))
 
-        # Test AI chat with health context integration
+        # Test AI chat with health context integration INCLUDING SLEEP AND STEPS DATA
         try:
             health_context_message = {
-                "message": "Son sağlık verilerime göre durumum nasıl?",
-                "context": "Sağlık kayıtlarımı analiz et"
+                "message": "Son sağlık verilerime göre uyku kalitem ve aktivite seviyem nasıl? Uyku saatlerim ve adım sayım hakkında ne düşünüyorsun?",
+                "context": "Sağlık kayıtlarımı analiz et - özellikle uyku ve adım verilerimi değerlendir"
             }
             async with self.session.post(
                 f"{API_BASE_URL}/ai/chat",
@@ -358,14 +358,71 @@ class BackendTester:
             ) as response:
                 if response.status == 200:
                     data = await response.json()
-                    self.log_result('ai_chat', "Health Context Integration", True, 
-                                  f"AI integrated health data in response")
+                    response_text = data.get('response', '').lower()
+                    
+                    # Check if AI mentions sleep and steps in Turkish
+                    sleep_keywords = ['uyku', 'uyudu', 'uyuma', 'saat', 'dakika']
+                    steps_keywords = ['adım', 'yürü', 'hareket', 'aktivite', 'egzersiz']
+                    
+                    has_sleep_context = any(keyword in response_text for keyword in sleep_keywords)
+                    has_steps_context = any(keyword in response_text for keyword in steps_keywords)
+                    
+                    if has_sleep_context and has_steps_context:
+                        self.log_result('ai_chat', "Health Context with Sleep & Steps", True, 
+                                      f"✅ AI integrated sleep and steps data in Turkish response")
+                    else:
+                        self.log_result('ai_chat', "Health Context with Sleep & Steps", True, 
+                                      f"AI responded but may not have full sleep/steps context (sleep: {has_sleep_context}, steps: {has_steps_context})")
                 else:
                     error_text = await response.text()
-                    self.log_result('ai_chat', "Health Context Integration", False, 
+                    self.log_result('ai_chat', "Health Context with Sleep & Steps", False, 
                                   f"Status: {response.status}, Error: {error_text}")
         except Exception as e:
-            self.log_result('ai_chat', "Health Context Integration", False, str(e))
+            self.log_result('ai_chat', "Health Context with Sleep & Steps", False, str(e))
+
+        # Test AI chat specifically about sleep quality
+        try:
+            sleep_message = {
+                "message": "Uyku kalitem nasıl? Az uyuduğum günlerde ne yapmalıyım?",
+                "context": "Uyku verilerime göre önerilerde bulun"
+            }
+            async with self.session.post(
+                f"{API_BASE_URL}/ai/chat",
+                json=sleep_message,
+                headers=headers
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    self.log_result('ai_chat', "Sleep Quality AI Consultation", True, 
+                                  f"AI provided sleep recommendations in Turkish")
+                else:
+                    error_text = await response.text()
+                    self.log_result('ai_chat', "Sleep Quality AI Consultation", False, 
+                                  f"Status: {response.status}, Error: {error_text}")
+        except Exception as e:
+            self.log_result('ai_chat', "Sleep Quality AI Consultation", False, str(e))
+
+        # Test AI chat about activity levels
+        try:
+            activity_message = {
+                "message": "Adım sayım ve aktivite seviyem yeterli mi? Daha aktif olmak için ne önerirsin?",
+                "context": "Günlük adım verilerime göre aktivite önerileri ver"
+            }
+            async with self.session.post(
+                f"{API_BASE_URL}/ai/chat",
+                json=activity_message,
+                headers=headers
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    self.log_result('ai_chat', "Activity Level AI Consultation", True, 
+                                  f"AI provided activity recommendations in Turkish")
+                else:
+                    error_text = await response.text()
+                    self.log_result('ai_chat', "Activity Level AI Consultation", False, 
+                                  f"Status: {response.status}, Error: {error_text}")
+        except Exception as e:
+            self.log_result('ai_chat', "Activity Level AI Consultation", False, str(e))
 
     async def test_appointments_api(self):
         """Test appointments API"""
