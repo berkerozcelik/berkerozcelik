@@ -176,8 +176,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All backend APIs tested and working"
-  stuck_tasks: []
+    - "Health Records API - Missing Sleep and Steps Fields"
+  stuck_tasks: 
+    - "Health Records API - Backend models need sleep_hours, sleep_minutes, steps fields"
   test_all: true
   test_priority: "high_first"
 
