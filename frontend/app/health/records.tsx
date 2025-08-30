@@ -162,7 +162,25 @@ export default function HealthRecords() {
   useEffect(() => {
     checkUser();
     fetchHealthRecords();
+    
+    // Start entrance animations
+    setTimeout(() => {
+      headerAnimation.fadeIn();
+      contentAnimation.animate(true);
+      startPeriodStagger();
+      startMetricStagger();
+      startSummaryStagger();
+      animateChartIn();
+    }, 100);
   }, []);
+
+  // Chart animation on metric/period change
+  useEffect(() => {
+    animateChartOut();
+    setTimeout(() => {
+      animateChartIn();
+    }, 300);
+  }, [selectedMetric, selectedPeriod]);
 
   const checkUser = async () => {
     try {
