@@ -215,8 +215,8 @@ export default function Index() {
         <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
         
         <View style={styles.header}>
-          <MaterialIcons name="health-and-safety" size={60} color={theme.colors.textInverse} />
-          <Text style={styles.appTitle}>Kanser Bakım</Text>
+          <MaterialIcons name="healing" size={60} color={theme.colors.textInverse} />
+          <Text style={styles.appTitle}>Onkom</Text>
           <Text style={styles.appSubtitle}>Sağlığınız bizim önceliğimiz</Text>
         </View>
 

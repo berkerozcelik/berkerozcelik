@@ -98,8 +98,8 @@ export default function Login() {
 
           <View style={styles.content}>
             <View style={styles.logoSection}>
-              <MaterialIcons name="health-and-safety" size={80} color={theme.colors.primary} />
-              <Text style={styles.appName}>Kanser Bakım</Text>
+              <MaterialIcons name="healing" size={80} color={theme.colors.primary} />
+              <Text style={styles.appName}>Onkom</Text>
               <Text style={styles.welcomeText}>Hesabınıza giriş yapın</Text>
             </View>
 
