@@ -624,7 +624,7 @@ class BackendTester:
         for i, chat_data in enumerate(turkish_messages):
             try:
                 async with self.session.post(
-                    f"{API_BASE_URL}/ai/chat",
+                    f"{API_BASE_URL}/chat",
                     json=chat_data,
                     headers=headers
                 ) as response:
