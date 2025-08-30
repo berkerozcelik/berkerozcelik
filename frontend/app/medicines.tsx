@@ -19,8 +19,28 @@ import axios from 'axios';
 import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withSequence,
+  FadeIn,
+  FadeOut,
+  SlideInUp,
+  SlideOutDown,
+  BounceIn,
+  Layout,
+} from 'react-native-reanimated';
 import { theme } from './theme';
 import { notificationService, MedicineReminder, generateWeeklyMedicineReport } from '../utils/notifications';
+import {
+  useSlideUpAnimation,
+  useFadeAnimation,
+  useScaleAnimation,
+  useModalAnimation,
+  useStaggeredAnimation,
+} from '../utils/animations';
 
 const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
 
