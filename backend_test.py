@@ -116,7 +116,7 @@ class BackendTester:
                 ) as response:
                     if response.status == 200:
                         data = await response.json()
-                        self.auth_tokens[role] = data['access_token']
+                        self.auth_tokens[role] = data['token']
                         self.log_result('authentication', f"Login {role}", True, 
                                       f"JWT token received for {user_data['name']}")
                     else:
