@@ -348,20 +348,41 @@ export default function Medicines() {
     }
   };
 
-  const toggleMedicineTaken = (medicineId: string) => {
+  const toggleMedicineTaken = async (medicineId: string) => {
+    const medicine = dailyMedicines.find(m => m.id === medicineId);
+    if (!medicine) return;
+
+    const newTakenStatus = !medicine.taken;
+    
     setDailyMedicines(prev => 
-      prev.map(medicine => 
-        medicine.id === medicineId 
-          ? { ...medicine, taken: !medicine.taken }
-          : medicine
+      prev.map(med => 
+        med.id === medicineId 
+          ? { 
+              ...med, 
+              taken: newTakenStatus, 
+              last_taken: newTakenStatus ? new Date().toISOString() : null,
+              missed_count: newTakenStatus ? 0 : med.missed_count
+            }
+          : med
       )
     );
     
-    Alert.alert(
-      'İlaç Durumu Güncellendi',
-      'İlacınızın alınma durumu güncellendi.',
-      [{ text: 'Tamam' }]
-    );
+    if (newTakenStatus) {
+      // Send confirmation notification
+      await notificationService.sendMedicineTakenConfirmation(medicine.name);
+      
+      Alert.alert(
+        '✅ İlaç Alındı',
+        `${medicine.name} başarıyla işaretlendi.`,
+        [{ text: 'Tamam' }]
+      );
+    } else {
+      Alert.alert(
+        'İlaç Durumu Güncellendi',
+        'İlacınızın alınma durumu güncellendi.',
+        [{ text: 'Tamam' }]
+      );
+    }
   };
 
   const checkAIInteraction = async () => {
