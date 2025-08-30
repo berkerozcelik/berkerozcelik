@@ -875,15 +875,36 @@ const styles = StyleSheet.create({
   medicineInfo: {
     flex: 1,
   },
+  medicineNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   medicineName: {
     fontSize: 16,
     fontWeight: '600',
     color: theme.colors.text,
-    marginBottom: 4,
+    flex: 1,
+  },
+  medicineDetails: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   medicineTime: {
-    fontSize: 14,
+    fontSize: 12,
     color: theme.colors.textSecondary,
+    marginRight: 12,
+  },
+  missedCount: {
+    fontSize: 12,
+    color: theme.colors.error,
+    marginRight: 12,
+  },
+  lastTaken: {
+    fontSize: 12,
+    color: theme.colors.success,
   },
   checkboxEmpty: {
     padding: 4,
