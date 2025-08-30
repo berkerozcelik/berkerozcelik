@@ -621,6 +621,21 @@ export default function Medicines() {
                 onChangeText={(text) => setNewMedicine({...newMedicine, time: text})}
               />
             </View>
+
+            <View style={styles.inputGroup}>
+              <View style={styles.switchRow}>
+                <Text style={styles.inputLabel}>Hatırlatma Bildirimleri</Text>
+                <Switch
+                  value={newMedicine.notifications_enabled}
+                  onValueChange={(value) => setNewMedicine({...newMedicine, notifications_enabled: value})}
+                  trackColor={{ false: theme.colors.border, true: theme.colors.strongTeal }}
+                  thumbColor={newMedicine.notifications_enabled ? '#FFFFFF' : theme.colors.textLight}
+                />
+              </View>
+              <Text style={styles.switchDescription}>
+                Bu ilaç için belirtilen saatte bildirim alın
+              </Text>
+            </View>
           </ScrollView>
         </SafeAreaView>
       </Modal>
