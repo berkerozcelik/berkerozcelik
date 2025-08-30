@@ -35,13 +35,44 @@ interface HealthRecord {
   recorded_at: string;
 }
 
+interface DailyTask {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  completed: boolean;
+  route: string;
+}
+
 export default function Index() {
   const [user, setUser] = useState<User | null>(null);
   const [latestHealth, setLatestHealth] = useState<HealthRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
+  const [completedTasks, setCompletedTasks] = useState(0);
+
+  const motivationMessages = [
+    "🌟 Güzel bir günün başlangıcı! Bugün kendinize iyi bakın.",
+    "💪 Her yeni gün yeni bir umut! Güçlü kalın.",
+    "🌈 Bugün küçük adımlarla büyük değişimler yaratacaksınız.",
+    "✨ Sağlığınız en değerli hazneniz. Bugün ona özen gösterin.",
+    "🦋 Her geçen gün daha güçlü oluyorsunuz. İnanın kendinize!",
+    "🌸 Bugün de hayatın güzelliklerini görmeyi unutmayın.",
+    "⭐ Sizin gücünüz sınırsız! Bugün bunu hissedin."
+  ];
+
+  const achievements = [
+    { id: 'health_tracker', name: 'Sağlık Takipçisi', icon: 'monitor-heart', earned: false },
+    { id: 'medicine_master', name: 'İlaç Uzmanı', icon: 'medication', earned: false },
+    { id: 'exercise_hero', name: 'Egzersiz Kahramanı', icon: 'fitness-center', earned: true },
+    { id: 'nutrition_pro', name: 'Beslenme Uzmanı', icon: 'restaurant', earned: false },
+    { id: 'ai_friend', name: 'AI Arkadaşı', icon: 'psychology', earned: true },
+  ];
 
   useEffect(() => {
     checkAuthStatus();
+    initializeDailyTasks();
   }, []);
 
   const checkAuthStatus = async () => {
@@ -74,6 +105,57 @@ export default function Index() {
     }
   };
 
+  const initializeDailyTasks = () => {
+    const tasks: DailyTask[] = [
+      {
+        id: '1',
+        title: 'Sabah Sağlık Ölçümü',
+        description: 'Kilo, ateş ve tansiyon ölçümünüzü kaydedin',
+        icon: 'monitor-heart',
+        color: theme.colors.health,
+        completed: false,
+        route: 'health/records'
+      },
+      {
+        id: '2',
+        title: 'Sabah İlaçları',
+        description: 'Günlük ilaçlarınızı almayı unutmayın',
+        icon: 'medication',
+        color: theme.colors.medicine,
+        completed: false,
+        route: 'medicines'
+      },
+      {
+        id: '3',
+        title: '15 Dakika Egzersiz',
+        description: 'Hafif egzersizlerle güne başlayın',
+        icon: 'fitness-center',
+        color: theme.colors.exercise,
+        completed: false,
+        route: 'exercise'
+      },
+      {
+        id: '4',
+        title: 'Sağlıklı Kahvaltı',
+        description: 'Beslenme planınıza uygun kahvaltı yapın',
+        icon: 'restaurant',
+        color: theme.colors.nutrition,
+        completed: false,
+        route: 'nutrition'
+      },
+      {
+        id: '5',
+        title: 'AI ile Sohbet',
+        description: 'Günlük sorularınızı AI asistana sorun',
+        icon: 'psychology',
+        color: theme.colors.ai,
+        completed: false,
+        route: 'ai-chat'
+      }
+    ];
+    setDailyTasks(tasks);
+  };
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.multiRemove(['auth_token', 'user_data']);
@@ -86,6 +168,36 @@ export default function Index() {
 
   const navigateToScreen = (screenName: string) => {
     router.push(`/${screenName}` as any);
+  };
+
+  const toggleTaskCompletion = (taskId: string) => {
+    setDailyTasks(tasks => 
+      tasks.map(task => 
+        task.id === taskId 
+          ? { ...task, completed: !task.completed }
+          : task
+      )
+    );
+    
+    const newCompletedCount = dailyTasks.filter(task => 
+      task.id === taskId ? !task.completed : task.completed
+    ).length;
+    
+    setCompletedTasks(newCompletedCount);
+    
+    if (newCompletedCount === dailyTasks.length) {
+      Alert.alert('🎉 Tebrikler!', 'Tüm günlük görevlerinizi tamamladınız!');
+    }
+  };
+
+  const getTodaysMotivation = () => {
+    const today = new Date().getDate();
+    return motivationMessages[today % motivationMessages.length];
+  };
+
+  const getProgressPercentage = () => {
+    if (dailyTasks.length === 0) return 0;
+    return Math.round((completedTasks / dailyTasks.length) * 100);
   };
 
   if (loading) {
@@ -193,7 +305,7 @@ export default function Index() {
         <View>
           <Text style={styles.greeting}>Merhaba, {user.name}</Text>
           <Text style={styles.roleText}>
-            {user.role === 'hasta' ? '👤 Hasta' : 
+            {user.role === 'hasta' ? '🩺 Hasta' : 
              user.role === 'doktor' ? '⚕️ Doktor' : '👨‍⚕️ Bakıcı'}
           </Text>
         </View>
@@ -203,6 +315,106 @@ export default function Index() {
       </View>
 
       <ScrollView style={styles.content}>
+        {/* Daily Motivation */}
+        <View style={styles.motivationCard}>
+          <MaterialIcons name="wb-sunny" size={32} color={theme.colors.warning} />
+          <View style={styles.motivationContent}>
+            <Text style={styles.motivationTitle}>Günaydın! ☀️</Text>
+            <Text style={styles.motivationText}>{getTodaysMotivation()}</Text>
+          </View>
+        </View>
+
+        {/* Daily Progress */}
+        <View style={styles.progressCard}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressTitle}>Günlük İlerleme</Text>
+            <Text style={styles.progressPercentage}>{getProgressPercentage()}%</Text>
+          </View>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${getProgressPercentage()}%` }]} />
+          </View>
+          <Text style={styles.progressText}>
+            {completedTasks}/{dailyTasks.length} görev tamamlandı
+          </Text>
+        </View>
+
+        {/* Daily Tasks */}
+        <View style={styles.tasksSection}>
+          <Text style={styles.sectionTitle}>Bugünkü Görevleriniz</Text>
+          
+          {dailyTasks.map((task, index) => (
+            <TouchableOpacity 
+              key={task.id}
+              style={[styles.taskCard, task.completed && styles.taskCardCompleted]}
+              onPress={() => {
+                toggleTaskCompletion(task.id);
+                if (!task.completed) {
+                  setTimeout(() => navigateToScreen(task.route), 1000);
+                }
+              }}
+            >
+              <View style={styles.taskLeft}>
+                <View style={[styles.taskNumber, { backgroundColor: task.color }]}>
+                  <Text style={styles.taskNumberText}>{index + 1}</Text>
+                </View>
+                <MaterialIcons 
+                  name={task.icon as any} 
+                  size={24} 
+                  color={task.completed ? theme.colors.success : task.color} 
+                />
+              </View>
+              
+              <View style={styles.taskContent}>
+                <Text style={[styles.taskTitle, task.completed && styles.taskTitleCompleted]}>
+                  {task.title}
+                </Text>
+                <Text style={[styles.taskDescription, task.completed && styles.taskDescriptionCompleted]}>
+                  {task.description}
+                </Text>
+              </View>
+              
+              <TouchableOpacity 
+                style={styles.taskCheckbox}
+                onPress={() => toggleTaskCompletion(task.id)}
+              >
+                <MaterialIcons 
+                  name={task.completed ? "check-circle" : "radio-button-unchecked"} 
+                  size={24} 
+                  color={task.completed ? theme.colors.success : theme.colors.textSecondary}
+                />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Achievements */}
+        <View style={styles.achievementsSection}>
+          <Text style={styles.sectionTitle}>Başarılarınız 🏆</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {achievements.map((achievement) => (
+              <View 
+                key={achievement.id} 
+                style={[
+                  styles.achievementCard,
+                  achievement.earned && styles.achievementCardEarned
+                ]}
+              >
+                <MaterialIcons 
+                  name={achievement.icon as any} 
+                  size={28} 
+                  color={achievement.earned ? theme.colors.warning : theme.colors.textLight}
+                />
+                <Text style={[
+                  styles.achievementName,
+                  achievement.earned && styles.achievementNameEarned
+                ]}>
+                  {achievement.name}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
         {/* Health Summary Card */}
         <View style={styles.summaryCard}>
           <Text style={styles.cardTitle}>Son Sağlık Verileri</Text>
@@ -294,6 +506,7 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  // ... (keeping all existing styles and adding new ones)
   container: {
     flex: 1,
     backgroundColor: theme.colors.backgroundSecondary,
@@ -345,6 +558,155 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: theme.spacing.base,
   },
+  
+  // New styles for motivation and tasks
+  motivationCard: {
+    backgroundColor: theme.colors.cardBackground,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.base,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.warning,
+    ...theme.shadows.sm,
+  },
+  motivationContent: {
+    flex: 1,
+    marginLeft: theme.spacing.base,
+  },
+  motivationTitle: {
+    ...theme.typography.h4,
+    marginBottom: theme.spacing.xs,
+  },
+  motivationText: {
+    ...theme.typography.body,
+    color: theme.colors.textSecondary,
+  },
+  
+  progressCard: {
+    backgroundColor: theme.colors.cardBackground,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
+    ...theme.shadows.sm,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+  },
+  progressTitle: {
+    ...theme.typography.h4,
+  },
+  progressPercentage: {
+    ...theme.typography.h3,
+    color: theme.colors.primary,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: theme.colors.borderLight,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: theme.spacing.sm,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: theme.colors.primary,
+  },
+  progressText: {
+    ...theme.typography.bodySecondary,
+    textAlign: 'center',
+  },
+  
+  tasksSection: {
+    marginBottom: theme.spacing.xl,
+  },
+  taskCard: {
+    backgroundColor: theme.colors.cardBackground,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    ...theme.shadows.sm,
+  },
+  taskCardCompleted: {
+    backgroundColor: theme.colors.backgroundAccent,
+    borderWidth: 1,
+    borderColor: theme.colors.success,
+  },
+  taskLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: theme.spacing.base,
+  },
+  taskNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: theme.spacing.sm,
+  },
+  taskNumberText: {
+    ...theme.typography.caption,
+    color: theme.colors.textInverse,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+  taskContent: {
+    flex: 1,
+    marginLeft: theme.spacing.sm,
+  },
+  taskTitle: {
+    ...theme.typography.body,
+    fontWeight: theme.typography.fontWeight.medium,
+    marginBottom: theme.spacing.xs,
+  },
+  taskTitleCompleted: {
+    textDecorationLine: 'line-through',
+    color: theme.colors.textSecondary,
+  },
+  taskDescription: {
+    ...theme.typography.bodySecondary,
+  },
+  taskDescriptionCompleted: {
+    color: theme.colors.textLight,
+  },
+  taskCheckbox: {
+    padding: theme.spacing.sm,
+  },
+  
+  achievementsSection: {
+    marginBottom: theme.spacing.xl,
+  },
+  achievementCard: {
+    backgroundColor: theme.colors.cardBackground,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.base,
+    alignItems: 'center',
+    marginRight: theme.spacing.md,
+    minWidth: 80,
+    ...theme.shadows.sm,
+  },
+  achievementCardEarned: {
+    backgroundColor: theme.colors.warning + '20',
+    borderWidth: 2,
+    borderColor: theme.colors.warning,
+  },
+  achievementName: {
+    ...theme.typography.caption,
+    marginTop: theme.spacing.xs,
+    textAlign: 'center',
+    color: theme.colors.textLight,
+  },
+  achievementNameEarned: {
+    color: theme.colors.warning,
+    fontWeight: theme.typography.fontWeight.medium,
+  },
+  
+  // Existing styles
   welcomeSection: {
     backgroundColor: theme.colors.cardBackground,
     padding: theme.spacing.xl,

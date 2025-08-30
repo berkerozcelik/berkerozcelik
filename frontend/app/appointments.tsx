@@ -35,6 +35,7 @@ export default function Appointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [newAppointment, setNewAppointment] = useState({
     doctor_name: '',
     specialty: '',
@@ -72,26 +73,71 @@ export default function Appointments() {
     }
   };
 
-  const handleAddAppointment = async () => {
-    if (!newAppointment.doctor_name || !newAppointment.specialty || !newAppointment.appointment_date) {
-      Alert.alert('Hata', 'Lütfen zorunlu alanları doldurun');
-      return;
+  const validateForm = () => {
+    if (!newAppointment.doctor_name.trim()) {
+      Alert.alert('Hata', 'Doktor adı zorunludur');
+      return false;
     }
+    if (!newAppointment.specialty) {
+      Alert.alert('Hata', 'Uzmanlık alanı seçiniz');
+      return false;
+    }
+    if (!newAppointment.appointment_date.trim()) {
+      Alert.alert('Hata', 'Randevu tarihi ve saati zorunludur');
+      return false;
+    }
+    
+    // Basic date format validation
+    const dateRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
+    if (!dateRegex.test(newAppointment.appointment_date)) {
+      Alert.alert('Hata', 'Tarih formatı: YYYY-MM-DD HH:MM (örn: 2024-09-15 10:30)');
+      return false;
+    }
+    
+    return true;
+  };
 
+  const handleAddAppointment = async () => {
+    if (!validateForm()) return;
+
+    setSaving(true);
     try {
       const token = await AsyncStorage.getItem('auth_token');
-      if (!token) return;
+      if (!token) {
+        Alert.alert('Hata', 'Oturum süresi dolmuş, lütfen tekrar giriş yapın');
+        router.replace('/auth/login');
+        return;
+      }
+
+      // Parse the date string and create ISO date
+      const [datePart, timePart] = newAppointment.appointment_date.split(' ');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+      
+      const appointmentDate = new Date(year, month - 1, day, hour, minute);
+      
+      if (isNaN(appointmentDate.getTime())) {
+        Alert.alert('Hata', 'Geçersiz tarih formatı');
+        return;
+      }
 
       const appointmentData = {
-        doctor_name: newAppointment.doctor_name,
+        doctor_name: newAppointment.doctor_name.trim(),
         specialty: newAppointment.specialty,
-        appointment_date: new Date(newAppointment.appointment_date).toISOString(),
-        notes: newAppointment.notes
+        appointment_date: appointmentDate.toISOString(),
+        notes: newAppointment.notes.trim() || null
       };
 
-      await axios.post(`${BACKEND_URL}/api/appointments`, appointmentData, {
-        headers: { Authorization: `Bearer ${token}` }
+      console.log('Sending appointment data:', appointmentData);
+
+      const response = await axios.post(`${BACKEND_URL}/api/appointments`, appointmentData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      console.log('Appointment created:', response.data);
 
       setShowAddModal(false);
       setNewAppointment({
@@ -101,10 +147,18 @@ export default function Appointments() {
         notes: ''
       });
       
-      Alert.alert('Başarılı', 'Randevunuz kaydedildi');
-      fetchAppointments();
-    } catch (error) {
-      Alert.alert('Hata', 'Randevu kaydedilirken bir hata oluştu');
+      Alert.alert('Başarılı', 'Randevunuz kaydedildi', [
+        { text: 'Tamam', onPress: () => fetchAppointments() }
+      ]);
+
+    } catch (error: any) {
+      console.error('Appointment save error:', error);
+      const errorMessage = error.response?.data?.detail || 
+                          error.response?.data?.message || 
+                          'Randevu kaydedilirken bir hata oluştu';
+      Alert.alert('Hata', errorMessage);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -137,6 +191,15 @@ export default function Appointments() {
     }
   };
 
+  const generateSampleDateTime = () => {
+    const now = new Date();
+    const futureDate = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 1 week from now
+    const year = futureDate.getFullYear();
+    const month = String(futureDate.getMonth() + 1).padStart(2, '0');
+    const day = String(futureDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day} 10:30`;
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -162,7 +225,7 @@ export default function Appointments() {
           style={styles.addButton}
           onPress={() => setShowAddModal(true)}
         >
-          <MaterialIcons name="add" size={24} color={theme.colors.textInverse} />
+          <MaterialIcons name="create" size={24} color={theme.colors.textInverse} />
         </TouchableOpacity>
       </View>
 
@@ -217,7 +280,7 @@ export default function Appointments() {
             <MaterialIcons name="calendar-today" size={64} color={theme.colors.textLight} />
             <Text style={styles.emptyTitle}>Henüz randevunuz yok</Text>
             <Text style={styles.emptyDescription}>
-              İlk randevunuzu oluşturmak için yukarıdaki + butonunu kullanın
+              İlk randevunuzu oluşturmak için yukarıdaki kalem simgesini kullanın
             </Text>
           </View>
         ) : (
@@ -287,8 +350,15 @@ export default function Appointments() {
               <Text style={styles.modalCancel}>İptal</Text>
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Yeni Randevu</Text>
-            <TouchableOpacity onPress={handleAddAppointment}>
-              <Text style={styles.modalSave}>Kaydet</Text>
+            <TouchableOpacity 
+              onPress={handleAddAppointment}
+              disabled={saving}
+            >
+              {saving ? (
+                <ActivityIndicator size="small" color={theme.colors.appointment} />
+              ) : (
+                <Text style={styles.modalSave}>Kaydet</Text>
+              )}
             </TouchableOpacity>
           </View>
           
@@ -300,6 +370,7 @@ export default function Appointments() {
                 placeholder="Örn: Dr. Ahmet Yılmaz"
                 value={newAppointment.doctor_name}
                 onChangeText={(text) => setNewAppointment({...newAppointment, doctor_name: text})}
+                editable={!saving}
               />
             </View>
             
@@ -318,6 +389,7 @@ export default function Appointments() {
                       newAppointment.specialty === specialty && styles.specialtyChipSelected
                     ]}
                     onPress={() => setNewAppointment({...newAppointment, specialty})}
+                    disabled={saving}
                   >
                     <Text
                       style={[
@@ -336,11 +408,12 @@ export default function Appointments() {
               <Text style={styles.inputLabel}>Randevu Tarihi ve Saati *</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Örn: 2024-09-15 10:30"
+                placeholder={generateSampleDateTime()}
                 value={newAppointment.appointment_date}
                 onChangeText={(text) => setNewAppointment({...newAppointment, appointment_date: text})}
+                editable={!saving}
               />
-              <Text style={styles.inputHint}>Format: YYYY-MM-DD HH:MM</Text>
+              <Text style={styles.inputHint}>Format: YYYY-MM-DD HH:MM (örn: 2024-09-15 10:30)</Text>
             </View>
             
             <View style={styles.inputGroup}>
@@ -352,6 +425,7 @@ export default function Appointments() {
                 onChangeText={(text) => setNewAppointment({...newAppointment, notes: text})}
                 multiline
                 numberOfLines={3}
+                editable={!saving}
               />
             </View>
           </ScrollView>
