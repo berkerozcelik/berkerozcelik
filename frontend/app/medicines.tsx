@@ -863,7 +863,8 @@ export default function Medicines() {
               </>
             )}
           </ScrollView>
-        </SafeAreaView>
+          </Animated.View>
+        </Animated.View>
       </Modal>
 
       {/* Bottom Navigation */}
