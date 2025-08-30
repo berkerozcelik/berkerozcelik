@@ -1095,6 +1095,17 @@ const styles = StyleSheet.create({
   selectedFrequencyText: {
     color: '#FFFFFF',
   },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  switchDescription: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+  },
   aiResponseText: {
     fontSize: 16,
     color: theme.colors.text,
@@ -1102,6 +1113,91 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: theme.colors.backgroundSecondary,
     borderRadius: 12,
+  },
+
+  // Notification Settings Modal Styles
+  notificationSettingsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  settingInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  settingTextContainer: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  settingDescription: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+  },
+  statisticsCard: {
+    backgroundColor: theme.colors.lightBlue,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+  },
+  statisticsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 16,
+  },
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.strongTeal,
+  },
+  tipsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.info,
+  },
+  tipsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 12,
+  },
+  tipText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+    marginBottom: 8,
   },
 
   // Bottom Navigation
