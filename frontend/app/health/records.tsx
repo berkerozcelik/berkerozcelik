@@ -712,17 +712,6 @@ export default function HealthRecords() {
             ))}
           </View>
         </View>
-            <MaterialIcons name="bedtime" size={32} color={theme.colors.strongTeal} />
-            <Text style={styles.summaryValue}>7s 20dk</Text>
-            <Text style={styles.summaryLabel}>Son Uyku</Text>
-          </View>
-
-          <View style={styles.summaryCard}>
-            <MaterialIcons name="directions-walk" size={32} color={theme.colors.success} />
-            <Text style={styles.summaryValue}>6.542</Text>
-            <Text style={styles.summaryLabel}>Bugün Adım</Text>
-          </View>
-        </View>
 
         {/* Recent Records */}
         <Text style={styles.sectionTitle}>Son Kayıtlar</Text>
