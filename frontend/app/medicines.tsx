@@ -152,6 +152,13 @@ export default function Medicines() {
     fetchMedicines();
     initializeNotifications();
     
+    // Start entrance animations
+    setTimeout(() => {
+      headerAnimation.fadeIn();
+      contentAnimation.animate(true);
+      startMedicineStagger();
+    }, 100);
+    
     // Notification listeners
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       console.log('Bildirim alındı:', notification);
