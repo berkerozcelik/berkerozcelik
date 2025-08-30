@@ -508,7 +508,8 @@ export default function Medicines() {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={theme.colors.backgroundLight} barStyle="dark-content" />
       
-      <View style={styles.header}>
+      {/* Animated Header */}
+      <Animated.View style={[styles.header, headerAnimation.animatedStyle]}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => router.back()}
@@ -519,7 +520,7 @@ export default function Medicines() {
         <View style={styles.headerActions}>
           <TouchableOpacity 
             style={styles.notificationButton}
-            onPress={() => setShowNotificationModal(true)}
+            onPress={handleShowNotificationModal}
           >
             <MaterialIcons 
               name={notificationsEnabled ? "notifications" : "notifications-off"} 
@@ -529,14 +530,16 @@ export default function Medicines() {
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.addButton}
-            onPress={() => setShowAddModal(true)}
+            onPress={handleShowAddModal}
           >
             <MaterialIcons name="add" size={24} color={theme.colors.text} />
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      {/* Animated Content */}
+      <Animated.View style={[styles.contentContainer, contentAnimation.animatedStyle]}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Today's Medicines */}
         <View style={styles.todaySection}>
           <Text style={styles.sectionTitle}>Bugün</Text>
