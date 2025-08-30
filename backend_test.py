@@ -651,7 +651,7 @@ class BackendTester:
                 "context": "Sağlık kayıtlarımı analiz et - özellikle uyku ve adım verilerimi değerlendir"
             }
             async with self.session.post(
-                f"{API_BASE_URL}/ai/chat",
+                f"{API_BASE_URL}/chat",
                 json=health_context_message,
                 headers=headers
             ) as response:
