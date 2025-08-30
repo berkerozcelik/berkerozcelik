@@ -686,7 +686,7 @@ class BackendTester:
                 "context": "Uyku verilerime göre önerilerde bulun"
             }
             async with self.session.post(
-                f"{API_BASE_URL}/ai/chat",
+                f"{API_BASE_URL}/chat",
                 json=sleep_message,
                 headers=headers
             ) as response:
