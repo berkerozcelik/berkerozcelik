@@ -1,123 +1,133 @@
 // Turkish Cancer Care App Theme Configuration
-// Based on provided design guidelines
+// Based on provided design guidelines with exact color palette
 
 export const theme = {
   colors: {
-    // Primary Colors from Design Guide
-    primary: '#5AACB0',      // Teal - main brand color
-    secondary: '#78C8A4',    // Light green - secondary actions
-    accent: '#44A878',       // Dark green - accent elements
-    surface: '#ADBDCD',      // Light gray - backgrounds
+    // Primary Colors from Design Guide - EXACT COLORS
+    primary: '#44A878',        // Main green from design
+    secondary: '#78C8A4',      // Light green 
+    accent: '#5AACB0',         // Teal accent
+    surface: '#ADBDCD',        // Light gray for surfaces
     
     // Status Colors
-    success: '#4CAF50',      // Success states
-    warning: '#FF9800',      // Warning states
-    error: '#F44336',        // Error states
-    info: '#2196F3',         // Info states
+    success: '#44A878',        // Green for success
+    warning: '#FF9800',        // Orange for warnings
+    error: '#F44336',          // Red for errors
+    info: '#5AACB0',           // Teal for info
     
     // Background Colors
-    background: '#FFFFFF',   // Main background
-    backgroundSecondary: '#F5F5F5', // Secondary background
-    backgroundAccent: '#E8F5E8',    // Accent background
+    background: '#FFFFFF',     // Pure white
+    backgroundSecondary: '#F8F9FA', // Very light gray
+    backgroundAccent: '#E8F5E8',    // Very light green
     
     // Text Colors
-    text: '#212121',         // Primary text
-    textSecondary: '#757575', // Secondary text
-    textLight: '#999999',    // Light text
-    textInverse: '#FFFFFF',  // White text for dark backgrounds
+    text: '#2C3E50',           // Dark blue-gray for primary text
+    textSecondary: '#7F8C8D',  // Medium gray for secondary text
+    textLight: '#BDC3C7',      // Light gray for hints
+    textInverse: '#FFFFFF',    // White text
     
     // Border Colors
-    border: '#E0E0E0',       // Default borders
-    borderLight: '#F0F0F0',  // Light borders
-    divider: '#EEEEEE',      // Divider lines
+    border: '#E1E8ED',         // Light border
+    borderLight: '#F7F9FA',    // Very light border
+    divider: '#ECEFF1',        // Divider lines
     
-    // Card Colors
+    // Card and Component Colors
     cardBackground: '#FFFFFF',
-    cardShadow: 'rgba(0, 0, 0, 0.1)',
+    cardShadow: 'rgba(0, 0, 0, 0.08)',
+    
+    // Specific Feature Colors
+    health: '#44A878',         // Health/medical green
+    appointment: '#5AACB0',    // Appointment teal
+    medicine: '#78C8A4',       // Medicine light green
+    ai: '#9B59B6',            // AI purple
+    nutrition: '#E67E22',      // Nutrition orange
+    exercise: '#E74C3C',       // Exercise red
   },
   
   typography: {
-    // Font Family (Turkish character support)
+    // Font Family - System fonts with better Turkish support
     fontFamily: {
-      regular: 'System',
-      medium: 'System',
-      bold: 'System',
+      regular: 'SF Pro Display',
+      medium: 'SF Pro Display',
+      bold: 'SF Pro Display',
     },
     
-    // Font Sizes
+    // Font Sizes - Improved hierarchy
     fontSize: {
-      xs: 12,
-      sm: 14,
-      base: 16,
-      lg: 18,
-      xl: 20,
-      '2xl': 24,
-      '3xl': 28,
-      '4xl': 32,
+      xs: 11,
+      sm: 13,
+      base: 15,
+      lg: 17,
+      xl: 19,
+      '2xl': 22,
+      '3xl': 26,
+      '4xl': 30,
     },
     
     // Font Weights
     fontWeight: {
+      light: '300',
       regular: '400',
       medium: '500',
       semibold: '600',
       bold: '700',
+      black: '800',
     },
     
     // Line Heights
     lineHeight: {
-      tight: 1.2,
+      tight: 1.25,
       normal: 1.4,
       relaxed: 1.6,
     },
     
     // Text Styles
     h1: {
-      fontSize: 28,
+      fontSize: 26,
       fontWeight: '700',
       lineHeight: 32,
-      color: '#212121',
+      color: '#2C3E50',
     },
     h2: {
-      fontSize: 24,
+      fontSize: 22,
       fontWeight: '600',
       lineHeight: 28,
-      color: '#212121',
+      color: '#2C3E50',
     },
     h3: {
-      fontSize: 20,
+      fontSize: 19,
       fontWeight: '600',
       lineHeight: 24,
-      color: '#212121',
+      color: '#2C3E50',
     },
     h4: {
-      fontSize: 18,
+      fontSize: 17,
       fontWeight: '500',
       lineHeight: 22,
-      color: '#212121',
+      color: '#2C3E50',
     },
     body: {
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: '400',
-      lineHeight: 24,
-      color: '#212121',
+      lineHeight: 22,
+      color: '#2C3E50',
     },
     bodySecondary: {
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: '400',
-      lineHeight: 20,
-      color: '#757575',
+      lineHeight: 18,
+      color: '#7F8C8D',
     },
     caption: {
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: '400',
-      lineHeight: 16,
-      color: '#757575',
+      lineHeight: 14,
+      color: '#7F8C8D',
     },
     button: {
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: '600',
-      lineHeight: 20,
+      lineHeight: 18,
     },
   },
   
@@ -136,10 +146,10 @@ export const theme = {
   
   borderRadius: {
     none: 0,
-    sm: 4,
-    base: 8,
-    lg: 12,
-    xl: 16,
+    sm: 6,
+    base: 10,
+    lg: 14,
+    xl: 18,
     full: 999,
   },
   
@@ -153,45 +163,45 @@ export const theme = {
     },
     sm: {
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
       elevation: 2,
     },
     base: {
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      elevation: 4,
     },
     lg: {
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 5,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.16,
+      shadowRadius: 16,
+      elevation: 8,
     },
   },
   
   // Component specific styles
   components: {
     button: {
-      height: 48,
-      borderRadius: 12,
+      height: 50,
+      borderRadius: 14,
       paddingHorizontal: 24,
-      paddingVertical: 12,
+      paddingVertical: 14,
     },
     input: {
-      height: 48,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
+      height: 50,
+      borderRadius: 14,
+      paddingHorizontal: 18,
+      paddingVertical: 14,
       borderWidth: 1,
     },
     card: {
-      borderRadius: 12,
-      padding: 16,
+      borderRadius: 14,
+      padding: 18,
       backgroundColor: '#FFFFFF',
     },
   },
