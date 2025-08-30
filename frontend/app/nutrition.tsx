@@ -240,7 +240,7 @@ export default function Nutrition() {
           style={styles.addFoodButton}
           onPress={() => setShowAddModal(true)}
         >
-          <MaterialIcons name="add-circle" size={24} color={theme.colors.nutrition} />
+          <MaterialIcons name="create" size={24} color={theme.colors.nutrition} />
           <Text style={styles.addFoodText}>Besin Ekle</Text>
         </TouchableOpacity>
 
