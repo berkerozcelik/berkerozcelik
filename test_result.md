@@ -310,7 +310,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All backend APIs tested and working"
+    - "Frontend comprehensive testing completed"
+    - "Sleep and steps integration verified"
+    - "Role-based dashboards tested"
+    - "Mobile UX confirmed"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
