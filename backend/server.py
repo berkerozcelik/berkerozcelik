@@ -324,7 +324,7 @@ async def register(request: RegisterRequest):
     else:
         raise HTTPException(status_code=500, detail="Kullanıcı oluşturulamadı")
 
-@app.post("/api/login")
+@app.post("/api/auth/login")
 async def login(request: LoginRequest):
     user = users_collection.find_one({"email": request.email})
     if not user or not verify_password(request.password, user["password_hash"]):
