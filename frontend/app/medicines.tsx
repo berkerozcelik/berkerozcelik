@@ -64,28 +64,40 @@ export default function Medicines() {
       name: 'Metformin 500mg',
       time: '09:00',
       taken: false,
-      interaction_warning: false
+      interaction_warning: false,
+      notifications_enabled: true,
+      last_taken: null,
+      missed_count: 0
     },
     {
       id: '2',
       name: 'Ondansetron 8mg',
       time: '14:00',
       taken: false,
-      interaction_warning: false
+      interaction_warning: false,
+      notifications_enabled: true,
+      last_taken: null,
+      missed_count: 1
     },
     {
       id: '3',
       name: 'Tramadol 50mg',
       time: '19:00',
       taken: true,
-      interaction_warning: false
+      interaction_warning: false,
+      notifications_enabled: true,
+      last_taken: new Date().toISOString(),
+      missed_count: 0
     },
     {
       id: '4',
       name: 'Letrozol 2,5mg',
       time: '22:00',
       taken: false,
-      interaction_warning: false
+      interaction_warning: false,
+      notifications_enabled: true,
+      last_taken: null,
+      missed_count: 0
     }
   ]);
 
