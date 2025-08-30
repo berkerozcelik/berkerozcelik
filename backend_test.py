@@ -708,7 +708,7 @@ class BackendTester:
                 "context": "Günlük adım verilerime göre aktivite önerileri ver"
             }
             async with self.session.post(
-                f"{API_BASE_URL}/ai/chat",
+                f"{API_BASE_URL}/chat",
                 json=activity_message,
                 headers=headers
             ) as response:
