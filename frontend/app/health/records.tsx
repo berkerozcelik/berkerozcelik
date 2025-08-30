@@ -554,7 +554,8 @@ export default function HealthRecords() {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={theme.colors.backgroundLight} barStyle="dark-content" />
       
-      <View style={styles.header}>
+      {/* Animated Header */}
+      <Animated.View style={[styles.header, headerAnimation.animatedStyle]}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => router.back()}
@@ -568,9 +569,11 @@ export default function HealthRecords() {
         >
           <MaterialIcons name="add" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      {/* Animated Content */}
+      <Animated.View style={[styles.contentContainer, contentAnimation.animatedStyle]}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Period Selection */}
         <View style={styles.periodSelection}>
           <Text style={styles.sectionTitle}>📅 Zaman Aralığı</Text>
