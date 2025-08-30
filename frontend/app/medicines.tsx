@@ -283,7 +283,33 @@ export default function Medicines() {
     }
   };
 
-  const toggleNotifications = async (enabled: boolean) => {
+  // Modal handlers with animations
+  const handleShowAddModal = () => {
+    setShowAddModal(true);
+    setTimeout(() => showModal(), 50);
+  };
+
+  const handleHideAddModal = () => {
+    hideModal(() => setShowAddModal(false));
+  };
+
+  const handleShowAIModal = () => {
+    setShowAIModal(true);
+    setTimeout(() => showAIModalAnim(), 50);
+  };
+
+  const handleHideAIModal = () => {
+    hideAIModalAnim(() => setShowAIModal(false));
+  };
+
+  const handleShowNotificationModal = () => {
+    setShowNotificationModal(true);
+    setTimeout(() => showNotificationModalAnim(), 50);
+  };
+
+  const handleHideNotificationModal = () => {
+    hideNotificationModalAnim(() => setShowNotificationModal(false));
+  };
     try {
       setNotificationsEnabled(enabled);
       
