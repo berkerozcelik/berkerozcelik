@@ -311,19 +311,37 @@ export default function Medicines() {
         name: `${newMedicine.name} ${newMedicine.dosage}`,
         time: newMedicine.time || '08:00',
         taken: false,
-        interaction_warning: false
+        interaction_warning: false,
+        notifications_enabled: newMedicine.notifications_enabled,
+        last_taken: null,
+        missed_count: 0
       };
       setDailyMedicines(prev => [...prev, newDailyMedicine]);
+
+      // Setup notification for new medicine if enabled
+      if (newMedicine.notifications_enabled && newMedicine.time && notificationsEnabled) {
+        const medicineReminder: MedicineReminder = {
+          medicineId: newDailyMedicine.id,
+          medicineName: newDailyMedicine.name,
+          dosage: newMedicine.dosage,
+          time: newMedicine.time,
+          frequency: newMedicine.frequency,
+          isActive: true
+        };
+        
+        await notificationService.scheduleMedicineReminder(medicineReminder);
+      }
 
       setShowAddModal(false);
       setNewMedicine({
         name: '',
         dosage: '',
         frequency: 'Günde 1 kez',
-        time: ''
+        time: '',
+        notifications_enabled: true
       });
       
-      Alert.alert('Başarılı', 'İlaç başarıyla eklendi');
+      Alert.alert('Başarılı', 'İlaç başarıyla eklendi ve hatırlatma ayarlandı');
     } catch (error) {
       console.error('Add medicine error:', error);
       Alert.alert('Hata', 'İlaç eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
