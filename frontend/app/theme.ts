@@ -214,6 +214,69 @@ export const theme = {
     },
   },
   
+  // Animation Configuration
+  animations: {
+    // Durations in milliseconds
+    duration: {
+      fast: 200,
+      normal: 300,
+      slow: 500,
+      slower: 800,
+    },
+    
+    // Easing curves
+    easing: {
+      ease: 'ease',
+      easeIn: 'ease-in',
+      easeOut: 'ease-out',
+      easeInOut: 'ease-in-out',
+      linear: 'linear',
+    },
+    
+    // Spring configurations
+    spring: {
+      gentle: {
+        damping: 15,
+        stiffness: 150,
+        mass: 1,
+      },
+      bouncy: {
+        damping: 10,
+        stiffness: 200,
+        mass: 1,
+      },
+      snappy: {
+        damping: 20,
+        stiffness: 300,
+        mass: 1,
+      },
+    },
+    
+    // Transition presets
+    transitions: {
+      fadeIn: {
+        duration: 300,
+        easing: 'ease-out',
+      },
+      slideUp: {
+        duration: 400,
+        easing: 'ease-out',
+      },
+      slideDown: {
+        duration: 300,
+        easing: 'ease-in',
+      },
+      scale: {
+        duration: 200,
+        easing: 'ease-out',
+      },
+      modal: {
+        duration: 500,
+        easing: 'ease-out',
+      },
+    },
+  },
+  
   // Component specific styles
   components: {
     button: {
