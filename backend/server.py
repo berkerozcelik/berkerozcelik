@@ -16,7 +16,11 @@ from bson import ObjectId
 import logging
 
 # Emergent Integrations for AI
-from emergentintegrations import EmergentIntegrations
+try:
+    from emergentintegrations import EmergentIntegrations
+except ImportError:
+    print("Warning: EmergentIntegrations not available, using mock AI responses")
+    EmergentIntegrations = None
 
 # Load environment variables
 load_dotenv()
