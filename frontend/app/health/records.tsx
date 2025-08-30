@@ -651,10 +651,10 @@ export default function HealthRecords() {
           </ScrollView>
         </View>
 
-        {/* Advanced Chart Display */}
-        <View style={styles.chartSection}>
+        {/* Advanced Chart Display - Animated */}
+        <Animated.View style={[styles.chartSection, chartAnimationStyle]}>
           {renderAdvancedChart()}
-        </View>
+        </Animated.View>
 
         {/* Health Insights */}
         <View style={styles.insightsSection}>
