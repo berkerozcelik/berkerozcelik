@@ -89,6 +89,14 @@ export default function HealthRecords() {
     notes: ''
   });
 
+  // Animation Hooks
+  const headerAnimation = useFadeAnimation(false);
+  const contentAnimation = useSlideUpAnimation(false);
+  const { animatedStyle: chartAnimationStyle, animateIn: animateChartIn, animateOut: animateChartOut } = useChartAnimation();
+  const { animatedStyles: periodButtonsAnimation, startStaggered: startPeriodStagger } = useStaggeredAnimation(3, 100);
+  const { animatedStyles: metricCardsAnimation, startStaggered: startMetricStagger } = useStaggeredAnimation(6, 150);
+  const { animatedStyles: summaryCardsAnimation, startStaggered: startSummaryStagger } = useStaggeredAnimation(4, 200);
+
   // Comprehensive health data for different periods
   const healthData = {
     '7d': {
