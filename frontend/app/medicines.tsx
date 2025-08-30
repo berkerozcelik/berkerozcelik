@@ -202,7 +202,7 @@ export default function Medicines() {
           style={styles.addButton}
           onPress={() => setShowAddModal(true)}
         >
-          <MaterialIcons name="add" size={24} color={theme.colors.textInverse} />
+          <MaterialIcons name="create" size={24} color={theme.colors.textInverse} />
         </TouchableOpacity>
       </View>
 
