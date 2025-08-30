@@ -58,6 +58,8 @@ export default function HealthRecords() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState('weight');
+  const [selectedPeriod, setSelectedPeriod] = useState('7d'); // 7d, 30d, 90d
+  const [showTrendAnalysis, setShowTrendAnalysis] = useState(false);
   const [newRecord, setNewRecord] = useState({
     weight: '',
     temperature: '',
@@ -71,15 +73,67 @@ export default function HealthRecords() {
     notes: ''
   });
 
-  // Mock data for charts - last 7 days
-  const mockHealthData = {
-    weight: [68.2, 68.5, 68.3, 68.7, 68.5, 68.9, 68.5],
-    temperature: [36.2, 36.5, 36.8, 36.4, 36.6, 36.3, 36.5],
-    sleep: [6.5, 7.2, 6.8, 7.5, 7.0, 7.8, 7.3],
-    steps: [4200, 5800, 6200, 5400, 6800, 7200, 6542]
+  // Comprehensive health data for different periods
+  const healthData = {
+    '7d': {
+      labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+      weight: [68.2, 68.5, 68.3, 68.7, 68.5, 68.9, 68.5],
+      temperature: [36.2, 36.5, 36.8, 36.4, 36.6, 36.3, 36.5],
+      sleep: [6.5, 7.2, 6.8, 7.5, 7.0, 7.8, 7.3],
+      steps: [4200, 5800, 6200, 5400, 6800, 7200, 6542],
+      heart_rate: [72, 75, 78, 70, 73, 76, 72],
+      blood_pressure_sys: [120, 118, 122, 115, 119, 121, 117],
+      blood_pressure_dia: [80, 78, 82, 75, 79, 81, 77]
+    },
+    '30d': {
+      labels: ['1H', '5H', '10H', '15H', '20H', '25H', '30H'],
+      weight: [69.2, 68.8, 68.5, 68.3, 68.1, 68.4, 68.5],
+      temperature: [36.4, 36.3, 36.5, 36.2, 36.6, 36.4, 36.5],
+      sleep: [6.8, 7.1, 7.0, 7.3, 7.2, 7.4, 7.3],
+      steps: [5200, 5800, 6100, 6300, 6500, 6800, 6542],
+      heart_rate: [74, 73, 72, 71, 73, 74, 72],
+      blood_pressure_sys: [122, 120, 118, 117, 119, 120, 117],
+      blood_pressure_dia: [82, 81, 79, 78, 79, 80, 77]
+    },
+    '90d': {
+      labels: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem'],
+      weight: [70.5, 69.8, 69.2, 68.8, 68.5, 68.3, 68.5],
+      temperature: [36.3, 36.4, 36.5, 36.2, 36.4, 36.3, 36.5],
+      sleep: [6.5, 6.8, 7.0, 7.2, 7.1, 7.3, 7.3],
+      steps: [4500, 5000, 5500, 5800, 6200, 6500, 6542],
+      heart_rate: [76, 75, 74, 73, 72, 73, 72],
+      blood_pressure_sys: [125, 123, 121, 119, 118, 119, 117],
+      blood_pressure_dia: [85, 83, 82, 80, 79, 80, 77]
+    }
   };
 
-  const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+  // Chart configuration
+  const chartConfig = {
+    backgroundColor: '#FFFFFF',
+    backgroundGradientFrom: '#FFFFFF',
+    backgroundGradientTo: '#FFFFFF',
+    color: (opacity = 1) => `rgba(90, 172, 176, ${opacity})`,
+    strokeWidth: 3,
+    barPercentage: 0.7,
+    decimalPlaces: 1,
+    propsForLabels: {
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    propsForVerticalLabels: {
+      fontSize: 10,
+    },
+    propsForHorizontalLabels: {
+      fontSize: 10,
+    },
+    propsForBackgroundLines: {
+      strokeDasharray: '',
+      stroke: '#E8E8E8',
+      strokeWidth: 1,
+    },
+    fillShadowGradient: '#5AACB0',
+    fillShadowGradientOpacity: 0.3,
+  };
 
   useEffect(() => {
     checkUser();
