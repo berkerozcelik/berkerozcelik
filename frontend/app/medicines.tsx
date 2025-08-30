@@ -402,6 +402,19 @@ export default function Medicines() {
 
     const newTakenStatus = !medicine.taken;
     
+    // Animate success feedback
+    if (newTakenStatus) {
+      pulseScale.value = withSequence(
+        withTiming(1.2, { duration: 200 }),
+        withSpring(1, theme.animations.spring.bouncy)
+      );
+      
+      successAnimation.value = withSequence(
+        withTiming(1, { duration: 300 }),
+        withTiming(0, { duration: 1000 })
+      );
+    }
+    
     setDailyMedicines(prev => 
       prev.map(med => 
         med.id === medicineId 
