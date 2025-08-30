@@ -607,7 +607,7 @@ export default function HealthRecords() {
           </View>
         </View>
 
-        {/* Metric Selection - Enhanced */}
+        {/* Metric Selection - Enhanced & Animated */}
         <View style={styles.metricSelection}>
           <Text style={styles.sectionTitle}>📊 Sağlık Metrikleri</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.metricsScroll}>
@@ -618,28 +618,35 @@ export default function HealthRecords() {
               { key: 'steps', icon: 'directions-walk', label: 'Adım', color: '#4CAF50' },
               { key: 'heart_rate', icon: 'favorite', label: 'Nabız', color: '#F44336' },
               { key: 'blood_pressure', icon: 'monitor-heart', label: 'Tansiyon', color: '#9C27B0' }
-            ].map((metric) => (
-              <TouchableOpacity
-                key={metric.key}
-                style={[
-                  styles.metricCard,
-                  selectedMetric === metric.key && styles.activeMetricCard,
-                  { borderLeftColor: metric.color }
-                ]}
-                onPress={() => setSelectedMetric(metric.key)}
+            ].map((metric, index) => (
+              <Animated.View 
+                key={metric.key} 
+                style={metricCardsAnimation[index]}
+                entering={SlideInRight.delay(index * 150)}
+                layout={Layout.springify()}
               >
-                <MaterialIcons 
-                  name={metric.icon as any} 
-                  size={24} 
-                  color={selectedMetric === metric.key ? '#FFFFFF' : metric.color} 
-                />
-                <Text style={[
-                  styles.metricCardText,
-                  selectedMetric === metric.key && styles.activeMetricCardText
-                ]}>
-                  {metric.label}
-                </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.metricCard,
+                    selectedMetric === metric.key && styles.activeMetricCard,
+                    { borderLeftColor: metric.color }
+                  ]}
+                  onPress={() => setSelectedMetric(metric.key)}
+                  activeOpacity={0.7}
+                >
+                  <MaterialIcons 
+                    name={metric.icon as any} 
+                    size={24} 
+                    color={selectedMetric === metric.key ? '#FFFFFF' : metric.color} 
+                  />
+                  <Text style={[
+                    styles.metricCardText,
+                    selectedMetric === metric.key && styles.activeMetricCardText
+                  ]}>
+                    {metric.label}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             ))}
           </ScrollView>
         </View>
