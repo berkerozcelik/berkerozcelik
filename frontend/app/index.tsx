@@ -51,6 +51,24 @@ export default function Index() {
   const moodEmojis = ['😰', '😟', '😐', '😊', '😁'];
   const moodTexts = ['Çok Kötü', 'Kötü', 'Normal', 'İyi', 'Çok İyi'];
 
+  // Today's tasks
+  const todayTasks = [
+    { id: 1, text: 'Sabah ilaçlarını al', time: '09:00', completed: true, icon: 'medication' },
+    { id: 2, text: 'Kan basıncını ölç', time: '10:00', completed: false, icon: 'favorite' },
+    { id: 3, text: '20 dakika yürüyüş yap', time: '11:00', completed: false, icon: 'directions-walk' },
+    { id: 4, text: 'Öğle ilaçlarını al', time: '14:00', completed: false, icon: 'medication' },
+    { id: 5, text: 'Psikolog randevusu', time: '15:30', completed: false, icon: 'event' }
+  ];
+
+  // This week's agenda
+  const weeklyAgenda = [
+    { day: 'Pazartesi', tasks: ['Kan tahlili', 'Diyetisyen randevusu'], completed: 2, total: 2 },
+    { day: 'Salı', tasks: ['İlaç takibi', 'Egzersiz programı'], completed: 1, total: 2 },
+    { day: 'Çarşamba', tasks: ['Kontrol muayenesi', 'Beslenme planı'], completed: 0, total: 2 },
+    { day: 'Perşembe', tasks: ['Fizik tedavi', 'Vitamin takviyesi'], completed: 0, total: 2 },
+    { day: 'Cuma', tasks: ['Uyku analizi', 'Psikolojik destek'], completed: 0, total: 2 }
+  ];
+
   useEffect(() => {
     checkAuthStatus();
   }, []);
@@ -118,6 +136,11 @@ export default function Index() {
         }
       ]
     );
+  };
+
+  const toggleTaskCompletion = (taskId: number) => {
+    // Task completion logic here
+    Alert.alert('Görev', 'Görev durumu güncellendi!');
   };
 
   if (loading) {
@@ -194,6 +217,65 @@ export default function Index() {
             <View style={styles.progressBarLarge} />
           </View>
         </TouchableOpacity>
+
+        {/* Bugün Seni Neler Bekliyor */}
+        <View style={styles.todayTasksContainer}>
+          <Text style={styles.sectionTitle}>Bugün Seni Neler Bekliyor</Text>
+          {todayTasks.map((task) => (
+            <TouchableOpacity 
+              key={task.id} 
+              style={[styles.taskCard, task.completed && styles.taskCompleted]}
+              onPress={() => toggleTaskCompletion(task.id)}
+            >
+              <View style={styles.taskContent}>
+                <MaterialIcons 
+                  name={task.icon as any} 
+                  size={20} 
+                  color={task.completed ? theme.colors.success : theme.colors.strongTeal} 
+                />
+                <View style={styles.taskInfo}>
+                  <Text style={[styles.taskText, task.completed && styles.taskTextCompleted]}>
+                    {task.text}
+                  </Text>
+                  <Text style={styles.taskTime}>{task.time}</Text>
+                </View>
+                <MaterialIcons 
+                  name={task.completed ? "check-circle" : "radio-button-unchecked"} 
+                  size={20} 
+                  color={task.completed ? theme.colors.success : theme.colors.textLight} 
+                />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Bu Hafta Bizi Neler Bekliyor */}
+        <View style={styles.weeklyAgendaContainer}>
+          <Text style={styles.sectionTitle}>Bu Hafta Bizi Neler Bekliyor</Text>
+          {weeklyAgenda.map((day, index) => (
+            <View key={index} style={styles.dayCard}>
+              <View style={styles.dayHeader}>
+                <Text style={styles.dayName}>{day.day}</Text>
+                <View style={styles.progressIndicator}>
+                  <Text style={styles.progressText}>{day.completed}/{day.total}</Text>
+                  <View style={styles.progressBarSmall}>
+                    <View 
+                      style={[
+                        styles.progressFill, 
+                        { width: `${(day.completed / day.total) * 100}%` }
+                      ]} 
+                    />
+                  </View>
+                </View>
+              </View>
+              <View style={styles.taskList}>
+                {day.tasks.map((task, taskIndex) => (
+                  <Text key={taskIndex} style={styles.dayTask}>• {task}</Text>
+                ))}
+              </View>
+            </View>
+          ))}
+        </View>
 
         {/* Mood Check */}
         <View style={styles.moodCard}>
@@ -503,6 +585,114 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: theme.colors.success,
     borderRadius: 3,
+  },
+
+  // Today's Tasks
+  todayTasksContainer: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 16,
+  },
+  taskCard: {
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+  },
+  taskCompleted: {
+    backgroundColor: theme.colors.lightBlue,
+    opacity: 0.7,
+  },
+  taskContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  taskInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  taskText: {
+    fontSize: 16,
+    color: theme.colors.text,
+    fontWeight: '500',
+  },
+  taskTextCompleted: {
+    textDecorationLine: 'line-through',
+    opacity: 0.7,
+  },
+  taskTime: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
+
+  // Weekly Agenda
+  weeklyAgendaContainer: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  dayCard: {
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  dayHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  dayName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  progressIndicator: {
+    alignItems: 'flex-end',
+  },
+  progressText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: 4,
+  },
+  progressBarSmall: {
+    width: 60,
+    height: 4,
+    backgroundColor: theme.colors.border,
+    borderRadius: 2,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: theme.colors.strongTeal,
+    borderRadius: 2,
+  },
+  taskList: {
+    marginTop: 8,
+  },
+  dayTask: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginBottom: 4,
   },
 
   // Mood Check

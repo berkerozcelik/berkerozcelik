@@ -50,6 +50,7 @@ export default function HealthRecords() {
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState('weight');
   const [newRecord, setNewRecord] = useState({
     weight: '',
     temperature: '',
@@ -62,6 +63,16 @@ export default function HealthRecords() {
     symptoms: '',
     notes: ''
   });
+
+  // Mock data for charts - last 7 days
+  const mockHealthData = {
+    weight: [68.2, 68.5, 68.3, 68.7, 68.5, 68.9, 68.5],
+    temperature: [36.2, 36.5, 36.8, 36.4, 36.6, 36.3, 36.5],
+    sleep: [6.5, 7.2, 6.8, 7.5, 7.0, 7.8, 7.3],
+    steps: [4200, 5800, 6200, 5400, 6800, 7200, 6542]
+  };
+
+  const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
   useEffect(() => {
     checkUser();
@@ -143,6 +154,48 @@ export default function HealthRecords() {
     }
   };
 
+  const renderChart = (data: number[], label: string, unit: string, color: string) => {
+    const maxValue = Math.max(...data);
+    const minValue = Math.min(...data);
+    const range = maxValue - minValue || 1;
+
+    return (
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>{label}</Text>
+        <View style={styles.chartArea}>
+          <View style={styles.yAxis}>
+            <Text style={styles.yAxisLabel}>{maxValue.toFixed(1)}</Text>
+            <Text style={styles.yAxisLabel}>{((maxValue + minValue) / 2).toFixed(1)}</Text>
+            <Text style={styles.yAxisLabel}>{minValue.toFixed(1)}</Text>
+          </View>
+          <View style={styles.chartContent}>
+            <View style={styles.chartBars}>
+              {data.map((value, index) => {
+                const height = ((value - minValue) / range) * 80 + 20;
+                return (
+                  <View key={index} style={styles.barContainer}>
+                    <View 
+                      style={[
+                        styles.bar, 
+                        { height: height, backgroundColor: color }
+                      ]} 
+                    />
+                    <Text style={styles.xAxisLabel}>{days[index]}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            <View style={styles.currentValue}>
+              <Text style={styles.currentValueText}>
+                {data[data.length - 1]}{unit}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('tr-TR', {
@@ -154,284 +207,6 @@ export default function HealthRecords() {
     });
   };
 
-  const renderPatientView = () => (
-    <>
-      {/* Summary Cards */}
-      <View style={styles.summaryContainer}>
-        <View style={styles.summaryCard}>
-          <MaterialIcons name="monitor-weight" size={32} color={theme.colors.health} />
-          <Text style={styles.summaryValue}>
-            {records.length > 0 && records[0].weight ? `${records[0].weight} kg` : 'Kayıt yok'}
-          </Text>
-          <Text style={styles.summaryLabel}>Son Kilo</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <MaterialIcons name="thermostat" size={32} color={theme.colors.warning} />
-          <Text style={styles.summaryValue}>
-            {records.length > 0 && records[0].temperature ? `${records[0].temperature}°C` : 'Kayıt yok'}
-          </Text>
-          <Text style={styles.summaryLabel}>Son Ateş</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <MaterialIcons name="bedtime" size={32} color={theme.colors.info} />
-          <Text style={styles.summaryValue}>
-            {records.length > 0 && records[0].sleep_hours ? 
-              `${records[0].sleep_hours}s ${records[0].sleep_minutes || 0}dk` : 
-              'Kayıt yok'}
-          </Text>
-          <Text style={styles.summaryLabel}>Son Uyku</Text>
-        </View>
-      </View>
-
-      {/* Records List */}
-      <Text style={styles.sectionTitle}>Geçmiş Kayıtlar</Text>
-      
-      {records.length === 0 ? (
-        <View style={styles.emptyState}>
-          <MaterialIcons name="health-and-safety" size={64} color={theme.colors.textLight} />
-          <Text style={styles.emptyTitle}>Henüz sağlık verisi yok</Text>
-          <Text style={styles.emptyDescription}>
-            İlk verilerinizi eklemek için yukarıdaki ✓ butonunu kullanın
-          </Text>
-        </View>
-      ) : (
-        records.map((record) => (
-          <View key={record.id} style={styles.recordCard}>
-            <View style={styles.recordHeader}>
-              <Text style={styles.recordDate}>{formatDate(record.recorded_at)}</Text>
-              <MaterialIcons name="more-vert" size={20} color={theme.colors.textSecondary} />
-            </View>
-            
-            <View style={styles.recordData}>
-              {record.weight && (
-                <View style={styles.dataItem}>
-                  <MaterialIcons name="monitor-weight" size={18} color={theme.colors.health} />
-                  <Text style={styles.dataLabel}>Kilo:</Text>
-                  <Text style={styles.dataValue}>{record.weight} kg</Text>
-                </View>
-              )}
-              
-              {record.temperature && (
-                <View style={styles.dataItem}>
-                  <MaterialIcons name="thermostat" size={18} color={theme.colors.warning} />
-                  <Text style={styles.dataLabel}>Ateş:</Text>
-                  <Text style={styles.dataValue}>{record.temperature}°C</Text>
-                </View>
-              )}
-              
-              {record.blood_pressure_systolic && (
-                <View style={styles.dataItem}>
-                  <MaterialIcons name="favorite" size={18} color={theme.colors.error} />
-                  <Text style={styles.dataLabel}>Tansiyon:</Text>
-                  <Text style={styles.dataValue}>
-                    {record.blood_pressure_systolic}/{record.blood_pressure_diastolic} mmHg
-                  </Text>
-                </View>
-              )}
-              
-              {record.heart_rate && (
-                <View style={styles.dataItem}>
-                  <MaterialIcons name="favorite-border" size={18} color={theme.colors.info} />
-                  <Text style={styles.dataLabel}>Nabız:</Text>
-                  <Text style={styles.dataValue}>{record.heart_rate} bpm</Text>
-                </View>
-              )}
-
-              {(record.sleep_hours || record.sleep_minutes) && (
-                <View style={styles.dataItem}>
-                  <MaterialIcons name="bedtime" size={18} color={theme.colors.info} />
-                  <Text style={styles.dataLabel}>Uyku:</Text>
-                  <Text style={styles.dataValue}>
-                    {record.sleep_hours || 0}s {record.sleep_minutes || 0}dk
-                  </Text>
-                </View>
-              )}
-
-              {record.steps && (
-                <View style={styles.dataItem}>
-                  <MaterialIcons name="directions-walk" size={18} color={theme.colors.accent} />
-                  <Text style={styles.dataLabel}>Adım:</Text>
-                  <Text style={styles.dataValue}>{record.steps} adım</Text>
-                </View>
-              )}
-            </View>
-            
-            {record.symptoms && record.symptoms.length > 0 && (
-              <View style={styles.symptomsContainer}>
-                <Text style={styles.symptomsTitle}>Semptomlar:</Text>
-                <View style={styles.symptomsWrapper}>
-                  {record.symptoms.map((symptom, index) => (
-                    <View key={index} style={styles.symptomTag}>
-                      <Text style={styles.symptomText}>{symptom}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-            
-            {record.notes && (
-              <View style={styles.notesContainer}>
-                <Text style={styles.notesTitle}>Notlar:</Text>
-                <Text style={styles.notesText}>{record.notes}</Text>
-              </View>
-            )}
-          </View>
-        ))
-      )}
-    </>
-  );
-
-  const renderDoctorView = () => (
-    <>
-      {/* Doctor Overview Cards */}
-      <View style={styles.doctorOverviewContainer}>
-        <View style={[styles.overviewCard, { backgroundColor: theme.colors.health }]}>
-          <MaterialIcons name="people" size={28} color="#FFF" />
-          <Text style={styles.overviewNumber}>23</Text>
-          <Text style={styles.overviewLabel}>Aktif Hasta</Text>
-        </View>
-        
-        <View style={[styles.overviewCard, { backgroundColor: theme.colors.warning }]}>
-          <MaterialIcons name="warning" size={28} color="#FFF" />
-          <Text style={styles.overviewNumber}>3</Text>
-          <Text style={styles.overviewLabel}>Kritik Durum</Text>
-        </View>
-        
-        <View style={[styles.overviewCard, { backgroundColor: theme.colors.info }]}>
-          <MaterialIcons name="trending-up" size={28} color="#FFF" />
-          <Text style={styles.overviewNumber}>87%</Text>
-          <Text style={styles.overviewLabel}>İyileşme Oranı</Text>
-        </View>
-      </View>
-
-      {/* Recent Patient Records */}
-      <Text style={styles.sectionTitle}>Son Hasta Kayıtları</Text>
-      
-      {records.slice(0, 5).map((record) => (
-        <View key={record.id} style={styles.patientRecordCard}>
-          <View style={styles.patientHeader}>
-            <View style={styles.patientAvatar}>
-              <MaterialIcons name="person" size={24} color={theme.colors.health} />
-            </View>
-            <View style={styles.patientInfo}>
-              <Text style={styles.patientName}>Hasta #{record.id.slice(-4)}</Text>
-              <Text style={styles.recordTime}>{formatDate(record.recorded_at)}</Text>
-            </View>
-            <View style={styles.statusIndicator}>
-              <View style={[styles.statusDot, { 
-                backgroundColor: record.temperature && record.temperature > 37.5 ? theme.colors.error : theme.colors.success 
-              }]} />
-            </View>
-          </View>
-          
-          <View style={styles.vitalSigns}>
-            {record.temperature && (
-              <View style={styles.vitalItem}>
-                <Text style={styles.vitalLabel}>Ateş</Text>
-                <Text style={[styles.vitalValue, { 
-                  color: record.temperature > 37.5 ? theme.colors.error : theme.colors.text 
-                }]}>
-                  {record.temperature}°C
-                </Text>
-              </View>
-            )}
-            {record.blood_pressure_systolic && (
-              <View style={styles.vitalItem}>
-                <Text style={styles.vitalLabel}>Tansiyon</Text>
-                <Text style={styles.vitalValue}>
-                  {record.blood_pressure_systolic}/{record.blood_pressure_diastolic}
-                </Text>
-              </View>
-            )}
-            {record.heart_rate && (
-              <View style={styles.vitalItem}>
-                <Text style={styles.vitalLabel}>Nabız</Text>
-                <Text style={styles.vitalValue}>{record.heart_rate} bpm</Text>
-              </View>
-            )}
-          </View>
-        </View>
-      ))}
-    </>
-  );
-
-  const renderCaregiverView = () => (
-    <>
-      {/* Patient Status Summary */}
-      <View style={styles.caregiverSummary}>
-        <Text style={styles.summaryTitle}>Hasta Durumu Özeti</Text>
-        
-        <View style={styles.statusRows}>
-          <View style={styles.statusRow}>
-            <MaterialIcons name="favorite" size={20} color={theme.colors.success} />
-            <Text style={styles.statusText}>Genel durum: İyi</Text>
-            <MaterialIcons name="check-circle" size={16} color={theme.colors.success} />
-          </View>
-          
-          <View style={styles.statusRow}>
-            <MaterialIcons name="thermostat" size={20} color={theme.colors.warning} />
-            <Text style={styles.statusText}>
-              Son ateş: {records.length > 0 && records[0].temperature ? `${records[0].temperature}°C` : 'Kayıt yok'}
-            </Text>
-          </View>
-          
-          <View style={styles.statusRow}>
-            <MaterialIcons name="bedtime" size={20} color={theme.colors.info} />
-            <Text style={styles.statusText}>
-              Son uyku: {records.length > 0 && records[0].sleep_hours ? 
-                `${records[0].sleep_hours}s ${records[0].sleep_minutes || 0}dk` : 
-                'Kayıt yok'}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Care Tasks */}
-      <View style={styles.careTasksContainer}>
-        <Text style={styles.sectionTitle}>Bugünkü Bakım Görevleri</Text>
-        
-        <View style={styles.taskItem}>
-          <MaterialIcons name="check-circle" size={20} color={theme.colors.success} />
-          <Text style={styles.taskText}>Sabah vital verileri alındı</Text>
-        </View>
-        
-        <View style={styles.taskItem}>
-          <MaterialIcons name="radio-button-unchecked" size={20} color={theme.colors.textLight} />
-          <Text style={styles.taskTextPending}>Öğle ilaç hatırlatması</Text>
-        </View>
-        
-        <View style={styles.taskItem}>
-          <MaterialIcons name="radio-button-unchecked" size={20} color={theme.colors.textLight} />
-          <Text style={styles.taskTextPending}>Akşam sağlık kontrolü</Text>
-        </View>
-      </View>
-
-      {/* Recent Records for Caregiver */}
-      <Text style={styles.sectionTitle}>Son Kayıtlar</Text>
-      
-      {records.slice(0, 3).map((record) => (
-        <View key={record.id} style={styles.caregiverRecordCard}>
-          <Text style={styles.recordTime}>{formatDate(record.recorded_at)}</Text>
-          <View style={styles.quickStats}>
-            {record.temperature && (
-              <Text style={styles.quickStat}>Ateş: {record.temperature}°C</Text>
-            )}
-            {record.weight && (
-              <Text style={styles.quickStat}>Kilo: {record.weight}kg</Text>
-            )}
-            {record.sleep_hours && (
-              <Text style={styles.quickStat}>
-                Uyku: {record.sleep_hours}s {record.sleep_minutes || 0}dk
-              </Text>
-            )}
-          </View>
-        </View>
-      ))}
-    </>
-  );
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -441,42 +216,194 @@ export default function HealthRecords() {
     );
   }
 
-  const renderContent = () => {
-    if (user?.role === 'doktor') {
-      return renderDoctorView();
-    } else if (user?.role === 'bakici') {
-      return renderCaregiverView();
-    } else {
-      return renderPatientView();
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={theme.colors.health} barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.backgroundLight} barStyle="dark-content" />
       
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <MaterialIcons name="arrow-back" size={24} color={theme.colors.textInverse} />
+          <MaterialIcons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {user?.role === 'doktor' ? 'Hasta Verileri' : 
-           user?.role === 'bakici' ? 'Bakım Takibi' : 
-           'Sağlık Verilerim'}
-        </Text>
+        <Text style={styles.headerTitle}>Sağlık Verilerim</Text>
         <TouchableOpacity 
           style={styles.addButton}
           onPress={() => setShowAddModal(true)}
         >
-          <MaterialIcons name="create" size={24} color={theme.colors.textInverse} />
+          <MaterialIcons name="add" size={24} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        {renderContent()}
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Chart Selection */}
+        <View style={styles.chartSelection}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity 
+              style={[styles.metricButton, selectedMetric === 'weight' && styles.selectedMetric]}
+              onPress={() => setSelectedMetric('weight')}
+            >
+              <MaterialIcons name="monitor-weight" size={20} color={selectedMetric === 'weight' ? '#FFFFFF' : theme.colors.strongTeal} />
+              <Text style={[styles.metricText, selectedMetric === 'weight' && styles.selectedMetricText]}>Kilo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.metricButton, selectedMetric === 'temperature' && styles.selectedMetric]}
+              onPress={() => setSelectedMetric('temperature')}
+            >
+              <MaterialIcons name="thermostat" size={20} color={selectedMetric === 'temperature' ? '#FFFFFF' : theme.colors.strongTeal} />
+              <Text style={[styles.metricText, selectedMetric === 'temperature' && styles.selectedMetricText]}>Ateş</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.metricButton, selectedMetric === 'sleep' && styles.selectedMetric]}
+              onPress={() => setSelectedMetric('sleep')}
+            >
+              <MaterialIcons name="bedtime" size={20} color={selectedMetric === 'sleep' ? '#FFFFFF' : theme.colors.strongTeal} />
+              <Text style={[styles.metricText, selectedMetric === 'sleep' && styles.selectedMetricText]}>Uyku</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.metricButton, selectedMetric === 'steps' && styles.selectedMetric]}
+              onPress={() => setSelectedMetric('steps')}
+            >
+              <MaterialIcons name="directions-walk" size={20} color={selectedMetric === 'steps' ? '#FFFFFF' : theme.colors.strongTeal} />
+              <Text style={[styles.metricText, selectedMetric === 'steps' && styles.selectedMetricText]}>Adım</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
+        {/* Chart Display */}
+        <View style={styles.chartSection}>
+          {selectedMetric === 'weight' && renderChart(mockHealthData.weight, 'Kilo Takibi', 'kg', theme.colors.info)}
+          {selectedMetric === 'temperature' && renderChart(mockHealthData.temperature, 'Vücut Sıcaklığı', '°C', theme.colors.warning)}
+          {selectedMetric === 'sleep' && renderChart(mockHealthData.sleep, 'Uyku Süresi', 's', theme.colors.strongTeal)}
+          {selectedMetric === 'steps' && renderChart(mockHealthData.steps, 'Günlük Adım', '', theme.colors.success)}
+        </View>
+
+        {/* Summary Cards */}
+        <View style={styles.summaryContainer}>
+          <View style={styles.summaryCard}>
+            <MaterialIcons name="monitor-weight" size={32} color={theme.colors.info} />
+            <Text style={styles.summaryValue}>68,5 kg</Text>
+            <Text style={styles.summaryLabel}>Son Kilo</Text>
+          </View>
+          
+          <View style={styles.summaryCard}>
+            <MaterialIcons name="thermostat" size={32} color={theme.colors.warning} />
+            <Text style={styles.summaryValue}>36,5°C</Text>
+            <Text style={styles.summaryLabel}>Son Ateş</Text>
+          </View>
+          
+          <View style={styles.summaryCard}>
+            <MaterialIcons name="bedtime" size={32} color={theme.colors.strongTeal} />
+            <Text style={styles.summaryValue}>7s 20dk</Text>
+            <Text style={styles.summaryLabel}>Son Uyku</Text>
+          </View>
+
+          <View style={styles.summaryCard}>
+            <MaterialIcons name="directions-walk" size={32} color={theme.colors.success} />
+            <Text style={styles.summaryValue}>6.542</Text>
+            <Text style={styles.summaryLabel}>Bugün Adım</Text>
+          </View>
+        </View>
+
+        {/* Recent Records */}
+        <Text style={styles.sectionTitle}>Son Kayıtlar</Text>
+        
+        {records.length === 0 ? (
+          <View style={styles.emptyState}>
+            <MaterialIcons name="health-and-safety" size={64} color={theme.colors.textLight} />
+            <Text style={styles.emptyTitle}>Henüz sağlık verisi yok</Text>
+            <Text style={styles.emptyDescription}>
+              İlk verilerinizi eklemek için yukarıdaki + butonunu kullanın
+            </Text>
+          </View>
+        ) : (
+          records.slice(0, 5).map((record) => (
+            <View key={record.id} style={styles.recordCard}>
+              <View style={styles.recordHeader}>
+                <Text style={styles.recordDate}>{formatDate(record.recorded_at)}</Text>
+                <MaterialIcons name="more-vert" size={20} color={theme.colors.textSecondary} />
+              </View>
+              
+              <View style={styles.recordData}>
+                {record.weight && (
+                  <View style={styles.dataItem}>
+                    <MaterialIcons name="monitor-weight" size={18} color={theme.colors.info} />
+                    <Text style={styles.dataLabel}>Kilo:</Text>
+                    <Text style={styles.dataValue}>{record.weight} kg</Text>
+                  </View>
+                )}
+                
+                {record.temperature && (
+                  <View style={styles.dataItem}>
+                    <MaterialIcons name="thermostat" size={18} color={theme.colors.warning} />
+                    <Text style={styles.dataLabel}>Ateş:</Text>
+                    <Text style={styles.dataValue}>{record.temperature}°C</Text>
+                  </View>
+                )}
+                
+                {record.blood_pressure_systolic && (
+                  <View style={styles.dataItem}>
+                    <MaterialIcons name="favorite" size={18} color={theme.colors.error} />
+                    <Text style={styles.dataLabel}>Tansiyon:</Text>
+                    <Text style={styles.dataValue}>
+                      {record.blood_pressure_systolic}/{record.blood_pressure_diastolic} mmHg
+                    </Text>
+                  </View>
+                )}
+                
+                {record.heart_rate && (
+                  <View style={styles.dataItem}>
+                    <MaterialIcons name="favorite-border" size={18} color={theme.colors.strongTeal} />
+                    <Text style={styles.dataLabel}>Nabız:</Text>
+                    <Text style={styles.dataValue}>{record.heart_rate} bpm</Text>
+                  </View>
+                )}
+
+                {(record.sleep_hours || record.sleep_minutes) && (
+                  <View style={styles.dataItem}>
+                    <MaterialIcons name="bedtime" size={18} color={theme.colors.strongTeal} />
+                    <Text style={styles.dataLabel}>Uyku:</Text>
+                    <Text style={styles.dataValue}>
+                      {record.sleep_hours || 0}s {record.sleep_minutes || 0}dk
+                    </Text>
+                  </View>
+                )}
+
+                {record.steps && (
+                  <View style={styles.dataItem}>
+                    <MaterialIcons name="directions-walk" size={18} color={theme.colors.success} />
+                    <Text style={styles.dataLabel}>Adım:</Text>
+                    <Text style={styles.dataValue}>{record.steps} adım</Text>
+                  </View>
+                )}
+              </View>
+              
+              {record.symptoms && record.symptoms.length > 0 && (
+                <View style={styles.symptomsContainer}>
+                  <Text style={styles.symptomsTitle}>Semptomlar:</Text>
+                  <View style={styles.symptomsWrapper}>
+                    {record.symptoms.map((symptom, index) => (
+                      <View key={index} style={styles.symptomTag}>
+                        <Text style={styles.symptomText}>{symptom}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+              
+              {record.notes && (
+                <View style={styles.notesContainer}>
+                  <Text style={styles.notesTitle}>Notlar:</Text>
+                  <Text style={styles.notesText}>{record.notes}</Text>
+                </View>
+              )}
+            </View>
+          ))
+        )}
       </ScrollView>
 
       {/* Add Record Modal */}
@@ -614,6 +541,54 @@ export default function HealthRecords() {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/')}
+        >
+          <MaterialIcons name="home" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Ana Sayfa</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/medicines')}
+        >
+          <MaterialIcons name="medication" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>İlaçlar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/appointments')}
+        >
+          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Planım</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
+          <MaterialIcons name="favorite" size={24} color={theme.colors.strongTeal} />
+          <Text style={[styles.navText, styles.activeNavText]}>Sağlık</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/appointments')}
+        >
+          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Randevu</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/profile')}
+        >
+          <MaterialIcons name="person" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Profil</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -621,13 +596,13 @@ export default function HealthRecords() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: theme.colors.backgroundLight,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: theme.colors.backgroundLight,
   },
   loadingText: {
     marginTop: theme.spacing.base,
@@ -635,63 +610,181 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   header: {
-    backgroundColor: theme.colors.health,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
-    paddingTop: theme.spacing['4xl'],
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    paddingTop: 50,
+    backgroundColor: theme.colors.backgroundLight,
   },
   backButton: {
-    padding: theme.spacing.sm,
+    padding: 8,
   },
   headerTitle: {
-    ...theme.typography.h2,
-    color: theme.colors.textInverse,
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.strongTeal,
   },
   addButton: {
-    padding: theme.spacing.sm,
+    padding: 8,
   },
   content: {
     flex: 1,
-    padding: theme.spacing.base,
+    backgroundColor: theme.colors.backgroundLight,
   },
-  
-  // Patient View Styles
-  summaryContainer: {
+
+  // Chart Selection
+  chartSelection: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  metricButton: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.xl,
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    marginRight: 12,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.strongTeal,
   },
-  summaryCard: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.base,
+  selectedMetric: {
+    backgroundColor: theme.colors.strongTeal,
+  },
+  metricText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.strongTeal,
+    marginLeft: 8,
+  },
+  selectedMetricText: {
+    color: '#FFFFFF',
+  },
+
+  // Chart Section
+  chartSection: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  chartContainer: {
+    minHeight: 200,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  chartArea: {
+    flexDirection: 'row',
+    height: 150,
+  },
+  yAxis: {
+    width: 40,
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingRight: 8,
+  },
+  yAxisLabel: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  chartContent: {
+    flex: 1,
+  },
+  chartBars: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    height: 120,
+  },
+  barContainer: {
     alignItems: 'center',
     flex: 1,
-    marginHorizontal: 4,
-    ...theme.shadows.sm,
+  },
+  bar: {
+    width: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  xAxisLabel: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  currentValue: {
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  currentValueText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: theme.colors.strongTeal,
+  },
+
+  // Summary Cards
+  summaryContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  summaryCard: {
+    width: (width - 48) / 2,
+    margin: 4,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    minHeight: 100,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   summaryValue: {
-    ...theme.typography.h4,
-    marginTop: theme.spacing.sm,
-    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginTop: 8,
   },
   summaryLabel: {
-    ...theme.typography.caption,
-    marginTop: theme.spacing.xs,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginTop: 4,
     textAlign: 'center',
   },
+
+  // Records Section
   sectionTitle: {
-    ...theme.typography.h3,
-    marginBottom: theme.spacing.base,
-    paddingHorizontal: theme.spacing.xs,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginHorizontal: 20,
+    marginBottom: 16,
   },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: theme.spacing['5xl'],
+    marginHorizontal: 20,
   },
   emptyTitle: {
     ...theme.typography.h3,
@@ -705,11 +798,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
   },
   recordCard: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.base,
-    ...theme.shadows.sm,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   recordHeader: {
     flexDirection: 'row',
@@ -760,7 +858,7 @@ const styles = StyleSheet.create({
   },
   symptomText: {
     ...theme.typography.bodySecondary,
-    color: theme.colors.health,
+    color: theme.colors.strongTeal,
   },
   notesContainer: {
     backgroundColor: theme.colors.backgroundSecondary,
@@ -776,151 +874,6 @@ const styles = StyleSheet.create({
     ...theme.typography.bodySecondary,
   },
 
-  // Doctor View Styles
-  doctorOverviewContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.xl,
-  },
-  overviewCard: {
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    alignItems: 'center',
-    flex: 1,
-    marginHorizontal: 4,
-    ...theme.shadows.sm,
-  },
-  overviewNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginTop: theme.spacing.sm,
-  },
-  overviewLabel: {
-    fontSize: 12,
-    color: '#FFFFFF',
-    marginTop: theme.spacing.xs,
-    textAlign: 'center',
-  },
-  patientRecordCard: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.base,
-    ...theme.shadows.sm,
-  },
-  patientHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  patientAvatar: {
-    width: 40,
-    height: 40,
-    backgroundColor: theme.colors.backgroundAccent,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: theme.spacing.md,
-  },
-  patientInfo: {
-    flex: 1,
-  },
-  patientName: {
-    ...theme.typography.h4,
-  },
-  recordTime: {
-    ...theme.typography.bodySecondary,
-    marginTop: 2,
-  },
-  statusIndicator: {
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  vitalSigns: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  vitalItem: {
-    alignItems: 'center',
-  },
-  vitalLabel: {
-    ...theme.typography.caption,
-    marginBottom: 4,
-  },
-  vitalValue: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-  },
-
-  // Caregiver View Styles
-  caregiverSummary: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
-    ...theme.shadows.sm,
-  },
-  summaryTitle: {
-    ...theme.typography.h3,
-    marginBottom: theme.spacing.md,
-  },
-  statusRows: {
-    marginTop: theme.spacing.sm,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.sm,
-  },
-  statusText: {
-    ...theme.typography.body,
-    marginLeft: theme.spacing.sm,
-    flex: 1,
-  },
-  careTasksContainer: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
-    ...theme.shadows.sm,
-  },
-  taskItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.sm,
-  },
-  taskText: {
-    ...theme.typography.body,
-    marginLeft: theme.spacing.sm,
-    color: theme.colors.success,
-  },
-  taskTextPending: {
-    ...theme.typography.body,
-    marginLeft: theme.spacing.sm,
-    color: theme.colors.textSecondary,
-  },
-  caregiverRecordCard: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.base,
-    ...theme.shadows.sm,
-  },
-  quickStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: theme.spacing.sm,
-  },
-  quickStat: {
-    ...theme.typography.bodySecondary,
-    textAlign: 'center',
-  },
-  
   // Modal Styles
   modalContainer: {
     flex: 1,
@@ -964,7 +917,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   textInput: {
-    backgroundColor: theme.colors.cardBackground,
+    backgroundColor: '#FFFFFF',
     borderRadius: theme.borderRadius.lg,
     paddingHorizontal: theme.spacing.base,
     paddingVertical: theme.spacing.md,
@@ -975,5 +928,35 @@ const styles = StyleSheet.create({
   textArea: {
     height: 80,
     textAlignVertical: 'top',
+  },
+
+  // Bottom Navigation
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 10,
+    paddingBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
+  activeNavItem: {
+    // Active state styling
+  },
+  navText: {
+    fontSize: 10,
+    color: theme.colors.textLight,
+    marginTop: 4,
+  },
+  activeNavText: {
+    color: theme.colors.strongTeal,
+    fontWeight: '600',
   },
 });
