@@ -1000,245 +1000,306 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.backgroundLight,
   },
-
-  // Chart Selection
-  chartSelection: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  metricButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 25,
-    marginRight: 12,
-    backgroundColor: theme.colors.backgroundSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.strongTeal,
-  },
-  selectedMetric: {
-    backgroundColor: theme.colors.strongTeal,
-  },
-  metricText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.strongTeal,
-    marginLeft: 8,
-  },
-  selectedMetricText: {
-    color: '#FFFFFF',
-  },
-
-  // Chart Section
-  chartSection: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  chartContainer: {
-    minHeight: 200,
-  },
-  chartTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  chartArea: {
-    flexDirection: 'row',
-    height: 150,
-  },
-  yAxis: {
-    width: 40,
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingRight: 8,
-  },
-  yAxisLabel: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-  chartContent: {
-    flex: 1,
-  },
-  chartBars: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    height: 120,
-  },
-  barContainer: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  bar: {
-    width: 16,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  xAxisLabel: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-  currentValue: {
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  currentValueText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: theme.colors.strongTeal,
-  },
-
-  // Summary Cards
-  summaryContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  summaryCard: {
-    width: (width - 48) / 2,
-    margin: 4,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    minHeight: 100,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  summaryValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginTop: 8,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-
-  // Records Section
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: theme.colors.text,
-    marginHorizontal: 20,
     marginBottom: 16,
   },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: theme.spacing['5xl'],
-    marginHorizontal: 20,
-  },
-  emptyTitle: {
-    ...theme.typography.h3,
-    marginTop: theme.spacing.base,
-    textAlign: 'center',
-  },
-  emptyDescription: {
-    ...theme.typography.bodySecondary,
-    marginTop: theme.spacing.sm,
-    textAlign: 'center',
-    paddingHorizontal: theme.spacing.xl,
-  },
-  recordCard: {
+
+  // Period Selection
+  periodSelection: {
     backgroundColor: '#FFFFFF',
+    margin: 16,
     borderRadius: 16,
     padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },
-  recordHeader: {
+  periodButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  periodButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    backgroundColor: theme.colors.backgroundSecondary,
+    marginHorizontal: 4,
     alignItems: 'center',
-    marginBottom: theme.spacing.md,
   },
-  recordDate: {
-    ...theme.typography.h4,
+  activePeriodButton: {
+    backgroundColor: theme.colors.strongTeal,
   },
-  recordData: {
-    marginBottom: theme.spacing.md,
+  periodButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: theme.colors.text,
   },
-  dataItem: {
+  activePeriodButtonText: {
+    color: '#FFFFFF',
+  },
+
+  // Metric Selection
+  metricSelection: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  metricsScroll: {
+    marginHorizontal: -8,
+  },
+  metricCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.sm,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 8,
+    minWidth: 120,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.strongTeal,
   },
-  dataLabel: {
-    ...theme.typography.body,
-    marginLeft: theme.spacing.sm,
-    minWidth: 80,
+  activeMetricCard: {
+    backgroundColor: theme.colors.strongTeal,
   },
-  dataValue: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    marginLeft: theme.spacing.sm,
+  metricCardText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginLeft: 8,
   },
-  symptomsContainer: {
-    marginBottom: theme.spacing.md,
+  activeMetricCardText: {
+    color: '#FFFFFF',
   },
-  symptomsTitle: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    marginBottom: theme.spacing.sm,
+
+  // Advanced Charts
+  chartSection: {
+    margin: 16,
   },
-  symptomsWrapper: {
+  advancedChartContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  chartStyle: {
+    borderRadius: 12,
+    marginVertical: 8,
+  },
+
+  // Chart Analysis
+  trendAnalysis: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  trendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  trendText: {
+    fontSize: 14,
+    color: theme.colors.text,
+    marginLeft: 8,
+    fontWeight: '500',
+  },
+  stepsProgress: {
+    alignItems: 'center',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  progressTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 12,
+  },
+  progressText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.success,
+    marginTop: 8,
+  },
+  sleepAnalysis: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  sleepMetric: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sleepMetricText: {
+    fontSize: 14,
+    color: theme.colors.text,
+    marginLeft: 8,
+    fontWeight: '500',
+  },
+  temperatureStatus: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  statusCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+
+  // Insights Section
+  insightsSection: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  insightCards: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  insightCard: {
+    flex: 1,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 4,
+    alignItems: 'center',
+  },
+  insightTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginTop: 8,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  insightText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+
+  // Enhanced Summary
+  enhancedSummaryContainer: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  summaryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  enhancedSummaryCard: {
+    width: (width - 72) / 2,
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  enhancedSummaryValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginTop: 8,
+  },
+  enhancedSummaryLabel: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginTop: 4,
+  },
+  summaryTrend: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+
+  // Records List
+  recordsList: {
+    marginHorizontal: 16,
+    marginBottom: 100,
+  },
+  recordCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  recordDate: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: theme.colors.strongTeal,
+    marginBottom: 8,
+  },
+  recordDetails: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  symptomTag: {
-    backgroundColor: theme.colors.backgroundAccent,
-    borderRadius: theme.borderRadius.base,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-    marginRight: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
+  recordDetail: {
+    marginRight: 16,
+    marginBottom: 4,
   },
-  symptomText: {
-    ...theme.typography.bodySecondary,
-    color: theme.colors.strongTeal,
+  recordLabel: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
   },
-  notesContainer: {
-    backgroundColor: theme.colors.backgroundSecondary,
-    borderRadius: theme.borderRadius.base,
-    padding: theme.spacing.md,
-  },
-  notesTitle: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    marginBottom: theme.spacing.xs,
-  },
-  notesText: {
-    ...theme.typography.bodySecondary,
+  recordValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
   },
 
   // Modal Styles
@@ -1250,80 +1311,52 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
   modalCancel: {
-    ...theme.typography.body,
+    fontSize: 16,
     color: theme.colors.textSecondary,
   },
   modalTitle: {
-    ...theme.typography.h3,
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
   },
   modalSave: {
-    ...theme.typography.body,
+    fontSize: 16,
     color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight.semibold,
+    fontWeight: '600',
   },
   modalContent: {
     flex: 1,
-    padding: theme.spacing.base,
+    padding: 20,
   },
   inputGroup: {
-    marginBottom: theme.spacing.base,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    marginBottom: theme.spacing.base,
+    marginBottom: 20,
   },
   inputLabel: {
-    ...theme.typography.body,
-    fontWeight: theme.typography.fontWeight.medium,
-    marginBottom: theme.spacing.sm,
+    fontSize: 16,
+    fontWeight: '500',
+    color: theme.colors.text,
+    marginBottom: 8,
   },
   textInput: {
     backgroundColor: '#FFFFFF',
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.md,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    ...theme.typography.body,
+    fontSize: 16,
   },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-
-  // Bottom Navigation
-  bottomNav: {
+  inputRow: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 10,
-    paddingBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
+    justifyContent: 'space-between',
   },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 5,
-  },
-  activeNavItem: {
-    // Active state styling
-  },
-  navText: {
-    fontSize: 10,
-    color: theme.colors.textLight,
-    marginTop: 4,
-  },
-  activeNavText: {
-    color: theme.colors.strongTeal,
-    fontWeight: '600',
+  inputHalf: {
+    width: (width - 72) / 2,
   },
 });
