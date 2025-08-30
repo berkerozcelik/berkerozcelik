@@ -77,6 +77,27 @@ export default function Medicines() {
     notifications_enabled: true
   });
 
+  // Animation Hooks
+  const headerAnimation = useFadeAnimation(false);
+  const contentAnimation = useSlideUpAnimation(false);
+  const { animatedStyles: medicineCardsAnimation, startStaggered: startMedicineStagger } = useStaggeredAnimation(dailyMedicines.length, 150);
+  const { animatedStyle: modalStyle, showModal, hideModal } = useModalAnimation(showAddModal);
+  const { animatedStyle: aiModalStyle, showModal: showAIModalAnim, hideModal: hideAIModalAnim } = useModalAnimation(showAIModal);
+  const { animatedStyle: notificationModalStyle, showModal: showNotificationModalAnim, hideModal: hideNotificationModalAnim } = useModalAnimation(showNotificationModal);
+
+  // Animation state
+  const pulseScale = useSharedValue(1);
+  const successAnimation = useSharedValue(0);
+
+  const animatedPulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseScale.value }],
+  }));
+
+  const animatedSuccessStyle = useAnimatedStyle(() => ({
+    opacity: successAnimation.value,
+    transform: [{ scale: successAnimation.value }],
+  }));
+
   // Günlük ilaç listesi - güncellendi
   const [dailyMedicines, setDailyMedicines] = useState([
     {
