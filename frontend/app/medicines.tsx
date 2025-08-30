@@ -32,6 +32,9 @@ interface Medicine {
   time: string;
   taken: boolean;
   interaction_warning?: boolean;
+  notifications_enabled?: boolean;
+  last_taken?: string;
+  missed_count?: number;
 }
 
 export default function Medicines() {
@@ -39,13 +42,19 @@ export default function Medicines() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationToken, setNotificationToken] = useState<string | null>(null);
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
   const [newMedicine, setNewMedicine] = useState({
     name: '',
     dosage: '',
     frequency: 'Günde 1 kez',
-    time: ''
+    time: '',
+    notifications_enabled: true
   });
 
   // Günlük ilaç listesi - güncellendi
