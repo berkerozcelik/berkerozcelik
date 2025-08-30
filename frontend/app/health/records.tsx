@@ -215,46 +215,277 @@ export default function HealthRecords() {
     }
   };
 
-  const renderChart = (data: number[], label: string, unit: string, color: string) => {
-    const maxValue = Math.max(...data);
-    const minValue = Math.min(...data);
-    const range = maxValue - minValue || 1;
-
-    return (
-      <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>{label}</Text>
-        <View style={styles.chartArea}>
-          <View style={styles.yAxis}>
-            <Text style={styles.yAxisLabel}>{maxValue.toFixed(1)}</Text>
-            <Text style={styles.yAxisLabel}>{((maxValue + minValue) / 2).toFixed(1)}</Text>
-            <Text style={styles.yAxisLabel}>{minValue.toFixed(1)}</Text>
-          </View>
-          <View style={styles.chartContent}>
-            <View style={styles.chartBars}>
-              {data.map((value, index) => {
-                const height = ((value - minValue) / range) * 80 + 20;
-                return (
-                  <View key={index} style={styles.barContainer}>
-                    <View 
-                      style={[
-                        styles.bar, 
-                        { height: height, backgroundColor: color }
-                      ]} 
-                    />
-                    <Text style={styles.xAxisLabel}>{days[index]}</Text>
-                  </View>
+  const renderAdvancedChart = () => {
+    const currentData = healthData[selectedPeriod];
+    const screenWidth = Dimensions.get('window').width;
+    
+    switch (selectedMetric) {
+      case 'weight':
+        return (
+          <View style={styles.advancedChartContainer}>
+            <Text style={styles.chartTitle}>📊 Kilo Trendi ({selectedPeriod})</Text>
+            <LineChart
+              data={{
+                labels: currentData.labels,
+                datasets: [{
+                  data: currentData.weight,
+                  color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
+                  strokeWidth: 3
+                }]
+              }}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={{
+                ...chartConfig,
+                color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
+              }}
+              style={styles.chartStyle}
+              bezier
+              withDots
+              withInnerLines
+              withOuterLines
+              withVerticalLines
+              withHorizontalLines
+              onDataPointClick={(data) => {
+                Alert.alert(
+                  'Kilo Detayı',
+                  `${currentData.labels[data.index]}: ${data.value} kg`
                 );
-              })}
+              }}
+            />
+            <View style={styles.trendAnalysis}>
+              <View style={styles.trendItem}>
+                <MaterialIcons name="trending-up" size={16} color={theme.colors.success} />
+                <Text style={styles.trendText}>Trend: {getTrend(currentData.weight)}</Text>
+              </View>
+              <View style={styles.trendItem}>
+                <MaterialIcons name="analytics" size={16} color={theme.colors.info} />
+                <Text style={styles.trendText}>Ortalama: {getAverage(currentData.weight)} kg</Text>
+              </View>
             </View>
-            <View style={styles.currentValue}>
-              <Text style={styles.currentValueText}>
-                {data[data.length - 1]}{unit}
+          </View>
+        );
+      
+      case 'steps':
+        return (
+          <View style={styles.advancedChartContainer}>
+            <Text style={styles.chartTitle}>👟 Günlük Adım Analizi</Text>
+            <BarChart
+              data={{
+                labels: currentData.labels,
+                datasets: [{
+                  data: currentData.steps
+                }]
+              }}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={{
+                ...chartConfig,
+                color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
+                barPercentage: 0.8,
+              }}
+              style={styles.chartStyle}
+              showValuesOnTopOfBars
+              fromZero
+            />
+            <View style={styles.stepsProgress}>
+              <Text style={styles.progressTitle}>Günlük Hedef: 8000 adım</Text>
+              <ProgressChart
+                data={{
+                  data: [currentData.steps[currentData.steps.length - 1] / 8000]
+                }}
+                width={100}
+                height={100}
+                strokeWidth={8}
+                radius={32}
+                chartConfig={{
+                  ...chartConfig,
+                  color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
+                }}
+                hideLegend
+              />
+              <Text style={styles.progressText}>
+                {Math.round((currentData.steps[currentData.steps.length - 1] / 8000) * 100)}%
               </Text>
             </View>
           </View>
+        );
+      
+      case 'sleep':
+        return (
+          <View style={styles.advancedChartContainer}>
+            <Text style={styles.chartTitle}>😴 Uyku Kalite Analizi</Text>
+            <LineChart
+              data={{
+                labels: currentData.labels,
+                datasets: [{
+                  data: currentData.sleep,
+                  color: (opacity = 1) => `rgba(90, 172, 176, ${opacity})`,
+                  strokeWidth: 3
+                }]
+              }}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={{
+                ...chartConfig,
+                color: (opacity = 1) => `rgba(90, 172, 176, ${opacity})`,
+              }}
+              style={styles.chartStyle}
+              bezier
+              withDots
+              segments={4}
+            />
+            <View style={styles.sleepAnalysis}>
+              <View style={styles.sleepMetric}>
+                <MaterialIcons name="bedtime" size={20} color={theme.colors.strongTeal} />
+                <Text style={styles.sleepMetricText}>Ort. Uyku: {getAverage(currentData.sleep)}s</Text>
+              </View>
+              <View style={styles.sleepMetric}>
+                <MaterialIcons name="star" size={20} color={theme.colors.warning} />
+                <Text style={styles.sleepMetricText}>Kalite: {getSleepQuality(currentData.sleep)}</Text>
+              </View>
+            </View>
+          </View>
+        );
+      
+      case 'temperature':
+        return (
+          <View style={styles.advancedChartContainer}>
+            <Text style={styles.chartTitle}>🌡️ Vücut Sıcaklığı Takibi</Text>
+            <LineChart
+              data={{
+                labels: currentData.labels,
+                datasets: [{
+                  data: currentData.temperature,
+                  color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
+                  strokeWidth: 3
+                }]
+              }}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={{
+                ...chartConfig,
+                color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
+              }}
+              style={styles.chartStyle}
+              bezier
+              withDots
+            />
+            <View style={styles.temperatureStatus}>
+              {getTemperatureStatus(currentData.temperature[currentData.temperature.length - 1])}
+            </View>
+          </View>
+        );
+      
+      case 'heart_rate':
+        return (
+          <View style={styles.advancedChartContainer}>
+            <Text style={styles.chartTitle}>❤️ Kalp Ritmi Analizi</Text>
+            <LineChart
+              data={{
+                labels: currentData.labels,
+                datasets: [{
+                  data: currentData.heart_rate,
+                  color: (opacity = 1) => `rgba(244, 67, 54, ${opacity})`,
+                  strokeWidth: 3
+                }]
+              }}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={{
+                ...chartConfig,
+                color: (opacity = 1) => `rgba(244, 67, 54, ${opacity})`,
+              }}
+              style={styles.chartStyle}
+              bezier
+              withDots
+            />
+          </View>
+        );
+      
+      case 'blood_pressure':
+        return (
+          <View style={styles.advancedChartContainer}>
+            <Text style={styles.chartTitle}>🩺 Kan Basıncı Trendi</Text>
+            <LineChart
+              data={{
+                labels: currentData.labels,
+                datasets: [
+                  {
+                    data: currentData.blood_pressure_sys,
+                    color: (opacity = 1) => `rgba(233, 30, 99, ${opacity})`,
+                    strokeWidth: 2
+                  },
+                  {
+                    data: currentData.blood_pressure_dia,
+                    color: (opacity = 1) => `rgba(156, 39, 176, ${opacity})`,
+                    strokeWidth: 2
+                  }
+                ],
+                legend: ['Sistolik', 'Diyastolik']
+              }}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={chartConfig}
+              style={styles.chartStyle}
+              bezier
+              withDots
+            />
+          </View>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  // Helper functions for analysis
+  const getTrend = (data: number[]) => {
+    const firstHalf = data.slice(0, Math.floor(data.length / 2));
+    const secondHalf = data.slice(Math.floor(data.length / 2));
+    const firstAvg = firstHalf.reduce((a, b) => a + b) / firstHalf.length;
+    const secondAvg = secondHalf.reduce((a, b) => a + b) / secondHalf.length;
+    
+    if (secondAvg > firstAvg) return '📈 Yükseliş';
+    if (secondAvg < firstAvg) return '📉 Düşüş';
+    return '➡️ Stabil';
+  };
+
+  const getAverage = (data: number[]) => {
+    return (data.reduce((a, b) => a + b) / data.length).toFixed(1);
+  };
+
+  const getSleepQuality = (sleepData: number[]) => {
+    const avg = parseFloat(getAverage(sleepData));
+    if (avg >= 7) return '🌟 Mükemmel';
+    if (avg >= 6) return '✅ İyi';
+    if (avg >= 5) return '⚠️ Orta';
+    return '❌ Yetersiz';
+  };
+
+  const getTemperatureStatus = (temp: number) => {
+    if (temp > 37.5) {
+      return (
+        <View style={[styles.statusCard, { backgroundColor: '#FFEBEE' }]}>
+          <MaterialIcons name="warning" size={20} color={theme.colors.error} />
+          <Text style={[styles.statusText, { color: theme.colors.error }]}>Yüksek Ateş</Text>
         </View>
-      </View>
-    );
+      );
+    } else if (temp > 37) {
+      return (
+        <View style={[styles.statusCard, { backgroundColor: '#FFF3E0' }]}>
+          <MaterialIcons name="info" size={20} color={theme.colors.warning} />
+          <Text style={[styles.statusText, { color: theme.colors.warning }]}>Hafif Yüksek</Text>
+        </View>
+      );
+    } else {
+      return (
+        <View style={[styles.statusCard, { backgroundColor: '#E8F5E8' }]}>
+          <MaterialIcons name="check-circle" size={20} color={theme.colors.success} />
+          <Text style={[styles.statusText, { color: theme.colors.success }]}>Normal</Text>
+        </View>
+      );
+    }
   };
 
   const formatDate = (dateString: string) => {
