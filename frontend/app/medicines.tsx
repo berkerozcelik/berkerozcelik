@@ -429,12 +429,24 @@ export default function Medicines() {
           <MaterialIcons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>İlaçlarım</Text>
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}
-        >
-          <MaterialIcons name="add" size={24} color={theme.colors.text} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            style={styles.notificationButton}
+            onPress={() => setShowNotificationModal(true)}
+          >
+            <MaterialIcons 
+              name={notificationsEnabled ? "notifications" : "notifications-off"} 
+              size={24} 
+              color={notificationsEnabled ? theme.colors.strongTeal : theme.colors.textLight} 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => setShowAddModal(true)}
+          >
+            <MaterialIcons name="add" size={24} color={theme.colors.text} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
