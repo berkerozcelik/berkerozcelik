@@ -458,10 +458,28 @@ export default function Medicines() {
             <View key={medicine.id} style={styles.medicineCard}>
               <View style={styles.medicineContent}>
                 <View style={styles.medicineInfo}>
-                  <Text style={styles.medicineName}>{medicine.name}</Text>
-                  {medicine.time && (
-                    <Text style={styles.medicineTime}>{medicine.time}</Text>
-                  )}
+                  <View style={styles.medicineNameRow}>
+                    <Text style={styles.medicineName}>{medicine.name}</Text>
+                    {medicine.notifications_enabled && notificationsEnabled && (
+                      <MaterialIcons name="notifications" size={16} color={theme.colors.strongTeal} />
+                    )}
+                  </View>
+                  <View style={styles.medicineDetails}>
+                    {medicine.time && (
+                      <Text style={styles.medicineTime}>⏰ {medicine.time}</Text>
+                    )}
+                    {medicine.missed_count > 0 && (
+                      <Text style={styles.missedCount}>❌ {medicine.missed_count} kaçırıldı</Text>
+                    )}
+                    {medicine.last_taken && (
+                      <Text style={styles.lastTaken}>
+                        ✅ Son: {new Date(medicine.last_taken).toLocaleTimeString('tr-TR', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </Text>
+                    )}
+                  </View>
                 </View>
                 <TouchableOpacity 
                   style={medicine.taken ? styles.checkboxChecked : styles.checkboxEmpty}
@@ -469,8 +487,8 @@ export default function Medicines() {
                 >
                   <MaterialIcons 
                     name={medicine.taken ? "check-box" : "check-box-outline-blank"} 
-                    size={20} 
-                    color={medicine.taken ? theme.colors.strongTeal : theme.colors.textLight} 
+                    size={24} 
+                    color={medicine.taken ? theme.colors.success : theme.colors.textLight} 
                   />
                 </TouchableOpacity>
               </View>
