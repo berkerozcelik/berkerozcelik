@@ -199,7 +199,10 @@ async def register(user_data: UserCreate):
     user_dict['hashed_password'] = hashed_password
     
     user = User(**user_dict)
-    await db.users.insert_one(user.dict())
+    # Insert with hashed password included
+    user_doc = user.dict()
+    user_doc['hashed_password'] = hashed_password
+    await db.users.insert_one(user_doc)
     
     # Create access token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
