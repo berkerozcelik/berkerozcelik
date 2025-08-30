@@ -801,7 +801,7 @@ export default function Medicines() {
         <Animated.View style={[styles.modalBackdrop, notificationModalStyle]}>
           <Animated.View style={[styles.modalContainer, notificationModalStyle]}>
           <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowNotificationModal(false)}>
+            <TouchableOpacity onPress={handleHideNotificationModal}>
               <Text style={styles.modalCancel}>Kapat</Text>
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Bildirim Ayarları</Text>
