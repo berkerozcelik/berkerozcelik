@@ -312,6 +312,8 @@ async def ai_chat(chat_data: AIChat, current_user: User = Depends(get_current_us
         - Ateş: {recent_record.get('temperature', 'Kayıtlı değil')} °C
         - Tansiyon: {recent_record.get('blood_pressure_systolic', 'Kayıtlı değil')}/{recent_record.get('blood_pressure_diastolic', 'Kayıtlı değil')} mmHg
         - Kalp atışı: {recent_record.get('heart_rate', 'Kayıtlı değil')} bpm
+        - Uyku süresi: {recent_record.get('sleep_hours', 'Kayıtlı değil')} saat {recent_record.get('sleep_minutes', 'Kayıtlı değil')} dakika
+        - Günlük adım sayısı: {recent_record.get('steps', 'Kayıtlı değil')} adım
         - Semptomlar: {', '.join(recent_record.get('symptoms', [])) if recent_record.get('symptoms') else 'Kayıtlı değil'}
         """
         
