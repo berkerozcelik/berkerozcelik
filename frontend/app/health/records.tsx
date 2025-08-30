@@ -977,5 +977,3 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 });
-</absolute_file_name>
-    </file>
