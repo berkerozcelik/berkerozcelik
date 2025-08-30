@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv('/app/frontend/.env')
 
 # Get backend URL from frontend env
-BACKEND_URL = os.getenv('EXPO_PUBLIC_BACKEND_URL', 'https://cancer-support-app.preview.emergentagent.com')
+BACKEND_URL = os.getenv('EXPO_PUBLIC_BACKEND_URL', 'https://onkom-health-ai.preview.emergentagent.com')
 API_BASE_URL = f"{BACKEND_URL}/api"
 
 async def test_sleep_steps_fields():
