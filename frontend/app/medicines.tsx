@@ -667,24 +667,25 @@ export default function Medicines() {
         )}
       </ScrollView>
 
-      {/* Add Medicine Modal */}
+      {/* Add Medicine Modal - Animated */}
       <Modal
         visible={showAddModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        transparent={true}
+        animationType="none"
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setShowAddModal(false)}>
-              <Text style={styles.modalCancel}>İptal</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Yeni İlaç Ekle</Text>
-            <TouchableOpacity onPress={handleAddMedicine}>
-              <Text style={styles.modalSave}>Kaydet</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <ScrollView style={styles.modalContent}>
+        <Animated.View style={[styles.modalBackdrop, modalStyle]}>
+          <Animated.View style={[styles.modalContainer, modalStyle]}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={handleHideAddModal}>
+                <Text style={styles.modalCancel}>İptal</Text>
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Yeni İlaç Ekle</Text>
+              <TouchableOpacity onPress={handleAddMedicine}>
+                <Text style={styles.modalSave}>Kaydet</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalContent}>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>İlaç Adı *</Text>
               <TextInput
