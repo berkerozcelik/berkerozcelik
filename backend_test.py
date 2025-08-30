@@ -223,22 +223,78 @@ class BackendTester:
         except Exception as e:
             self.log_result('health_records', "Get All Health Records", False, str(e))
 
-        # Test retrieving latest health record
+        # Test retrieving latest health record WITH NEW FIELDS VERIFICATION
         try:
             async with self.session.get(f"{API_BASE_URL}/health/records/latest", headers=headers) as response:
                 if response.status == 200:
                     data = await response.json()
                     if data:
-                        self.log_result('health_records', "Get Latest Health Record", True, 
-                                      f"Latest record: Weight={data.get('weight')}kg, Temp={data.get('temperature')}°C")
+                        # Verify all new fields are present and properly stored
+                        sleep_hours = data.get('sleep_hours')
+                        sleep_minutes = data.get('sleep_minutes') 
+                        steps = data.get('steps')
+                        weight = data.get('weight')
+                        temp = data.get('temperature')
+                        
+                        # Check if new fields exist
+                        has_sleep_data = sleep_hours is not None and sleep_minutes is not None
+                        has_steps_data = steps is not None
+                        
+                        if has_sleep_data and has_steps_data:
+                            self.log_result('health_records', "Get Latest Health Record with Sleep & Steps", True, 
+                                          f"✅ NEW FIELDS VERIFIED: Weight={weight}kg, Temp={temp}°C, Sleep={sleep_hours}h {sleep_minutes}m, Steps={steps}")
+                        else:
+                            self.log_result('health_records', "Get Latest Health Record with Sleep & Steps", False, 
+                                          f"❌ MISSING NEW FIELDS: sleep_hours={sleep_hours}, sleep_minutes={sleep_minutes}, steps={steps}")
                     else:
-                        self.log_result('health_records', "Get Latest Health Record", True, "No records found")
+                        self.log_result('health_records', "Get Latest Health Record with Sleep & Steps", True, "No records found")
                 else:
                     error_text = await response.text()
-                    self.log_result('health_records', "Get Latest Health Record", False, 
+                    self.log_result('health_records', "Get Latest Health Record with Sleep & Steps", False, 
                                   f"Status: {response.status}, Error: {error_text}")
         except Exception as e:
-            self.log_result('health_records', "Get Latest Health Record", False, str(e))
+            self.log_result('health_records', "Get Latest Health Record with Sleep & Steps", False, str(e))
+
+        # Test edge cases for new fields validation
+        edge_case_data = [
+            {
+                "weight": 70.0,
+                "temperature": 36.5,
+                "sleep_hours": 0,  # Minimum sleep
+                "sleep_minutes": 0,
+                "steps": 0,  # Minimum steps
+                "symptoms": ["uykusuzluk"],
+                "notes": "Hiç uyuyamadım, hareket edemedim"
+            },
+            {
+                "weight": 70.0,
+                "temperature": 36.5,
+                "sleep_hours": 12,  # Long sleep
+                "sleep_minutes": 59,  # Max minutes
+                "steps": 25000,  # High step count
+                "symptoms": ["çok yorgun"],
+                "notes": "Çok uyudum ve çok yürüdüm"
+            }
+        ]
+
+        # Test edge cases
+        for i, edge_data in enumerate(edge_case_data):
+            try:
+                async with self.session.post(
+                    f"{API_BASE_URL}/health/records",
+                    json=edge_data,
+                    headers=headers
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        self.log_result('health_records', f"Edge Case Test {i+1}", True, 
+                                      f"Sleep: {edge_data['sleep_hours']}h {edge_data['sleep_minutes']}m, Steps: {edge_data['steps']}")
+                    else:
+                        error_text = await response.text()
+                        self.log_result('health_records', f"Edge Case Test {i+1}", False, 
+                                      f"Status: {response.status}, Error: {error_text}")
+            except Exception as e:
+                self.log_result('health_records', f"Edge Case Test {i+1}", False, str(e))
 
     async def test_ai_chat_integration(self):
         """Test AI chat integration with Turkish language"""
