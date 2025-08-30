@@ -55,7 +55,7 @@ predictions_collection = db.predictions
 
 # Initialize Emergent Integrations
 emergent_key = os.getenv("EMERGENT_LLM_KEY", "")
-ei = EmergentIntegrations(api_key=emergent_key) if emergent_key else None
+ei = EmergentIntegrations(api_key=emergent_key) if emergent_key and EmergentIntegrations else None
 
 # User Models
 class User(BaseModel):
