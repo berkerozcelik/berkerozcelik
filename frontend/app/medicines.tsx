@@ -668,6 +668,79 @@ export default function Medicines() {
         </SafeAreaView>
       </Modal>
 
+      {/* Notification Settings Modal */}
+      <Modal
+        visible={showNotificationModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowNotificationModal(false)}>
+              <Text style={styles.modalCancel}>Kapat</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Bildirim Ayarları</Text>
+            <View style={styles.placeholder} />
+          </View>
+          
+          <ScrollView style={styles.modalContent}>
+            <View style={styles.notificationSettingsCard}>
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <MaterialIcons name="notifications" size={24} color={theme.colors.strongTeal} />
+                  <View style={styles.settingTextContainer}>
+                    <Text style={styles.settingTitle}>İlaç Hatırlatmaları</Text>
+                    <Text style={styles.settingDescription}>
+                      İlaç alma saatlerinizde bildirim alın
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={toggleNotifications}
+                  trackColor={{ false: theme.colors.border, true: theme.colors.strongTeal }}
+                  thumbColor={notificationsEnabled ? '#FFFFFF' : theme.colors.textLight}
+                />
+              </View>
+            </View>
+
+            {notificationsEnabled && (
+              <>
+                <View style={styles.statisticsCard}>
+                  <Text style={styles.statisticsTitle}>📊 Bildirim İstatistikleri</Text>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Aktif Hatırlatmalar:</Text>
+                    <Text style={styles.statValue}>
+                      {dailyMedicines.filter(m => m.notifications_enabled).length}
+                    </Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Bugün Alınan İlaçlar:</Text>
+                    <Text style={styles.statValue}>
+                      {dailyMedicines.filter(m => m.taken).length}/{dailyMedicines.length}
+                    </Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Kaçırılan İlaçlar:</Text>
+                    <Text style={styles.statValue}>
+                      {dailyMedicines.reduce((sum, m) => sum + (m.missed_count || 0), 0)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.tipsCard}>
+                  <Text style={styles.tipsTitle}>💡 İpuçları</Text>
+                  <Text style={styles.tipText}>• Hatırlatmaları kaçırmamak için telefonunuzun sesini açık tutun</Text>
+                  <Text style={styles.tipText}>• İlaç aldığınızda bildirimi işaretlemeyi unutmayın</Text>
+                  <Text style={styles.tipText}>• Kaçırılan ilaçlar için 30 dakika sonra tekrar hatırlatma alırsınız</Text>
+                  <Text style={styles.tipText}>• Haftalık ilaç raporunu Pazartesi sabahları alırsınız</Text>
+                </View>
+              </>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
         <TouchableOpacity 
