@@ -824,6 +824,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: theme.colors.strongTeal,
+    flex: 1,
+    textAlign: 'center',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  notificationButton: {
+    padding: 8,
+    marginRight: 8,
   },
   addButton: {
     padding: 8,
