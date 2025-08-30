@@ -81,6 +81,9 @@ class HealthRecord(BaseModel):
     blood_pressure_systolic: Optional[int] = None
     blood_pressure_diastolic: Optional[int] = None
     heart_rate: Optional[int] = None
+    sleep_hours: Optional[int] = None
+    sleep_minutes: Optional[int] = None
+    steps: Optional[int] = None
     symptoms: Optional[List[str]] = []
     notes: Optional[str] = None
     recorded_at: datetime = Field(default_factory=datetime.utcnow)
@@ -91,6 +94,9 @@ class HealthRecordCreate(BaseModel):
     blood_pressure_systolic: Optional[int] = None
     blood_pressure_diastolic: Optional[int] = None
     heart_rate: Optional[int] = None
+    sleep_hours: Optional[int] = None
+    sleep_minutes: Optional[int] = None
+    steps: Optional[int] = None
     symptoms: Optional[List[str]] = []
     notes: Optional[str] = None
 
