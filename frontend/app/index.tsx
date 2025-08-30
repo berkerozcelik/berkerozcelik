@@ -44,7 +44,7 @@ export default function Index() {
   const [user, setUser] = useState<User | null>(null);
   const [latestHealth, setLatestHealth] = useState<HealthRecord | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentMood, setCurrentMood] = useState(2); // 0-4 (very sad to very happy)
+  const [currentMood, setCurrentMood] = useState(3); // Başlangıçta 'İyi' (index 3)
   const [activeTab, setActiveTab] = useState('home');
 
   const moodEmojis = ['😰', '😟', '😐', '😊', '😁'];
@@ -115,7 +115,7 @@ export default function Index() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#5AACB0" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Yükleniyor...</Text>
       </View>
     );
@@ -124,17 +124,21 @@ export default function Index() {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar backgroundColor="#5AACB0" barStyle="light-content" />
+        <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
         
         <View style={styles.welcomeHeader}>
           <MaterialIcons name="healing" size={80} color="#FFFFFF" />
           <Text style={styles.welcomeTitle}>Onkom</Text>
           <Text style={styles.welcomeSubtitle}>Sağlığınız bizim önceliğimiz</Text>
+          <Text style={styles.welcomeImprovement}>
+            💡 Dün bugünden %15 daha az uyudunuz - bugün daha iyi hissetmek için 8 saat uyumayı hedefleyin!
+          </Text>
         </View>
 
         <View style={styles.welcomeContent}>
           <Text style={styles.welcomeDescription}>
             Kanser bakım sürecinizde size yardımcı olmak için buradayız. 
+            Sağlık verilerinizi takip edin, uzmanlarınızla iletişim kurun.
           </Text>
 
           <TouchableOpacity 
@@ -158,18 +162,29 @@ export default function Index() {
   // Role-based Dashboard Rendering
   const renderPatientDashboard = () => (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#5AACB0" barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.patientHeader}>
           <View>
             <Text style={styles.greetingText}>Merhaba</Text>
-            <Text style={styles.nameText}>{user.name.split(' ')[0]}</Text>
+            <Text style={styles.nameText}>Ümit</Text>
           </View>
           <TouchableOpacity onPress={handleLogout}>
             <MaterialIcons name="logout" size={24} color="#FFF" />
           </TouchableOpacity>
+        </View>
+
+        {/* İyileştirme Önerileri */}
+        <View style={styles.improvementCard}>
+          <MaterialIcons name="trending-up" size={24} color={theme.colors.success} />
+          <Text style={styles.improvementTitle}>Bugün Daha İyi!</Text>
+          <Text style={styles.improvementText}>
+            ✅ Dünden %8 daha fazla yürüdünüz (9,200 adım){'\n'}
+            ✅ Uyku kaliteniz %12 arttı (7s 45dk){'\n'}
+            💡 Su tüketiminizi artırırsanız enerji seviyeniz daha da yükselir!
+          </Text>
         </View>
 
         {/* Mood Check */}
@@ -186,40 +201,65 @@ export default function Index() {
               </TouchableOpacity>
             ))}
           </View>
+          <Text style={styles.moodLabel}>{moodTexts[currentMood]}</Text>
         </View>
 
-        {/* Health Stats Grid */}
+        {/* Device Integration Panel */}
+        <View style={styles.devicePanel}>
+          <Text style={styles.deviceTitle}>Cihaz Entegrasyonları</Text>
+          <View style={styles.deviceRow}>
+            <View style={[styles.deviceCard, styles.deviceConnected]}>
+              <MaterialIcons name="monitor-weight" size={20} color={theme.colors.deviceConnected} />
+              <Text style={styles.deviceName}>Akıllı Terazi</Text>
+              <Text style={styles.deviceStatus}>Bağlı</Text>
+            </View>
+            <View style={[styles.deviceCard, styles.deviceConnected]}>
+              <MaterialIcons name="favorite" size={20} color={theme.colors.deviceConnected} />
+              <Text style={styles.deviceName}>Nabız Sensörü</Text>
+              <Text style={styles.deviceStatus}>Bağlı</Text>
+            </View>
+            <View style={[styles.deviceCard, styles.devicePending]}>
+              <MaterialIcons name="directions-walk" size={20} color={theme.colors.devicePending} />
+              <Text style={styles.deviceName}>Adım Sayar</Text>
+              <Text style={styles.deviceStatus}>Senkronize ediliyor...</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Health Stats Grid - Güncellenmiş verilerle */}
         <View style={styles.statsGrid}>
           {/* Sleep */}
-          <View style={[styles.statCard, { backgroundColor: '#4A90E2' }]}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.sleep }]}>
             <MaterialIcons name="bedtime" size={24} color="#FFF" />
-            <Text style={styles.statLabel}>Uyku: {latestHealth?.sleep_hours || 7}s {latestHealth?.sleep_minutes || 20}dk</Text>
+            <Text style={styles.statValue}>7s 45dk</Text>
+            <Text style={styles.statLabel}>Uyku (+12%)</Text>
             <View style={styles.sleepProgress}>
-              <View style={[styles.progressBar, { width: '75%' }]} />
+              <View style={[styles.progressBar, { width: '85%' }]} />
             </View>
           </View>
 
           {/* Steps */}
-          <View style={[styles.statCard, { backgroundColor: '#7ED321' }]}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.steps }]}>
             <MaterialIcons name="directions-walk" size={24} color="#FFF" />
-            <Text style={styles.statValue}>{latestHealth?.steps || 6542}</Text>
-            <Text style={styles.statLabel}>Adım</Text>
+            <Text style={styles.statValue}>9,200</Text>
+            <Text style={styles.statLabel}>Adım (+8%)</Text>
+            <Text style={styles.statSubLabel}>Hedef: 10,000</Text>
           </View>
 
           {/* Heart Rate */}
-          <View style={[styles.statCard, { backgroundColor: '#F5A623' }]}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.error }]}>
             <MaterialIcons name="favorite" size={24} color="#FFF" />
-            <Text style={styles.statValue}>{latestHealth?.heart_rate || 72} BPM</Text>
-            <Text style={styles.statLabel}>Kalp</Text>
-            <Text style={styles.statSubLabel}>781</Text>
+            <Text style={styles.statValue}>68 BPM</Text>
+            <Text style={styles.statLabel}>Kalp (-6%)</Text>
+            <Text style={styles.statSubLabel}>Normal aralık</Text>
           </View>
 
           {/* Weight */}
-          <View style={[styles.statCard, { backgroundColor: '#50E3C2' }]}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.info }]}>
             <MaterialIcons name="monitor-weight" size={24} color="#FFF" />
-            <Text style={styles.statValue}>{latestHealth?.weight || 68.5} kg</Text>
-            <Text style={styles.statLabel}>Kilo</Text>
-            <Text style={styles.statSubLabel}>BMI</Text>
+            <Text style={styles.statValue}>71.2 kg</Text>
+            <Text style={styles.statLabel}>Kilo (+0.3kg)</Text>
+            <Text style={styles.statSubLabel}>BMI: 22.8</Text>
           </View>
         </View>
 
@@ -228,8 +268,8 @@ export default function Index() {
           style={styles.aiChatInput}
           onPress={() => navigateToScreen('ai-chat')}
         >
-          <Text style={styles.aiChatPlaceholder}>Yapay zekaya soru sor...</Text>
-          <MaterialIcons name="send" size={20} color="#5AACB0" />
+          <Text style={styles.aiChatPlaceholder}>AI'ya soru sor: "Bugünkü iyileşmelerim nasıl?"</Text>
+          <MaterialIcons name="send" size={20} color={theme.colors.primary} />
         </TouchableOpacity>
 
         {/* Emergency Button */}
@@ -240,7 +280,7 @@ export default function Index() {
         {/* Quick Actions */}
         <View style={styles.quickActionsGrid}>
           <TouchableOpacity 
-            style={[styles.quickAction, { backgroundColor: '#4A90E2' }]}
+            style={[styles.quickAction, { backgroundColor: theme.colors.medicine }]}
             onPress={() => navigateToScreen('medicines')}
           >
             <MaterialIcons name="medication" size={24} color="#FFF" />
@@ -248,7 +288,7 @@ export default function Index() {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.quickAction, { backgroundColor: '#7ED321' }]}
+            style={[styles.quickAction, { backgroundColor: theme.colors.nutrition }]}
             onPress={() => navigateToScreen('nutrition')}
           >
             <MaterialIcons name="restaurant" size={24} color="#FFF" />
@@ -256,7 +296,7 @@ export default function Index() {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.quickAction, { backgroundColor: '#F5A623' }]}
+            style={[styles.quickAction, { backgroundColor: theme.colors.exercise }]}
             onPress={() => navigateToScreen('exercise')}
           >
             <MaterialIcons name="fitness-center" size={24} color="#FFF" />
@@ -264,7 +304,7 @@ export default function Index() {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.quickAction, { backgroundColor: '#50E3C2' }]}
+            style={[styles.quickAction, { backgroundColor: theme.colors.appointment }]}
             onPress={() => navigateToScreen('appointments')}
           >
             <MaterialIcons name="calendar-today" size={24} color="#FFF" />
@@ -279,7 +319,7 @@ export default function Index() {
           style={[styles.navItem, activeTab === 'home' && styles.activeNavItem]}
           onPress={() => setActiveTab('home')}
         >
-          <MaterialIcons name="home" size={24} color={activeTab === 'home' ? '#5AACB0' : '#B0BEC5'} />
+          <MaterialIcons name="home" size={24} color={activeTab === 'home' ? theme.colors.primary : theme.colors.textLight} />
           <Text style={[styles.navText, activeTab === 'home' && styles.activeNavText]}>Ana Sayfa</Text>
         </TouchableOpacity>
 
@@ -287,23 +327,15 @@ export default function Index() {
           style={[styles.navItem, activeTab === 'medicines' && styles.activeNavItem]}
           onPress={() => navigateToScreen('medicines')}
         >
-          <MaterialIcons name="medication" size={24} color={activeTab === 'medicines' ? '#5AACB0' : '#B0BEC5'} />
+          <MaterialIcons name="medication" size={24} color={activeTab === 'medicines' ? theme.colors.primary : theme.colors.textLight} />
           <Text style={[styles.navText, activeTab === 'medicines' && styles.activeNavText]}>İlaçlar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'appointments' && styles.activeNavItem]}
-          onPress={() => navigateToScreen('appointments')}
-        >
-          <MaterialIcons name="calendar-today" size={24} color={activeTab === 'appointments' ? '#5AACB0' : '#B0BEC5'} />
-          <Text style={[styles.navText, activeTab === 'appointments' && styles.activeNavText]}>Planlım</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.navItem, activeTab === 'health' && styles.activeNavItem]}
           onPress={() => navigateToScreen('health/records')}
         >
-          <MaterialIcons name="favorite" size={24} color={activeTab === 'health' ? '#5AACB0' : '#B0BEC5'} />
+          <MaterialIcons name="favorite" size={24} color={activeTab === 'health' ? theme.colors.primary : theme.colors.textLight} />
           <Text style={[styles.navText, activeTab === 'health' && styles.activeNavText]}>Sağlık</Text>
         </TouchableOpacity>
 
@@ -311,7 +343,7 @@ export default function Index() {
           style={[styles.navItem, activeTab === 'appointments' && styles.activeNavItem]}
           onPress={() => navigateToScreen('appointments')}
         >
-          <MaterialIcons name="event" size={24} color={activeTab === 'appointments' ? '#5AACB0' : '#B0BEC5'} />
+          <MaterialIcons name="event" size={24} color={activeTab === 'appointments' ? theme.colors.primary : theme.colors.textLight} />
           <Text style={[styles.navText, activeTab === 'appointments' && styles.activeNavText]}>Randevu</Text>
         </TouchableOpacity>
 
@@ -319,7 +351,7 @@ export default function Index() {
           style={[styles.navItem, activeTab === 'profile' && styles.activeNavItem]}
           onPress={() => setActiveTab('profile')}
         >
-          <MaterialIcons name="person" size={24} color={activeTab === 'profile' ? '#5AACB0' : '#B0BEC5'} />
+          <MaterialIcons name="person" size={24} color={activeTab === 'profile' ? theme.colors.primary : theme.colors.textLight} />
           <Text style={[styles.navText, activeTab === 'profile' && styles.activeNavText]}>Profil</Text>
         </TouchableOpacity>
       </View>
@@ -328,7 +360,7 @@ export default function Index() {
 
   const renderDoctorDashboard = () => (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#5AACB0" barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Doctor Header */}
@@ -342,16 +374,27 @@ export default function Index() {
           </TouchableOpacity>
         </View>
 
+        {/* İyileştirme Önerileri - Doktor */}
+        <View style={styles.doctorImprovementCard}>
+          <MaterialIcons name="analytics" size={24} color={theme.colors.info} />
+          <Text style={styles.improvementTitle}>Hasta İyileştirme Analizi</Text>
+          <Text style={styles.improvementText}>
+            📈 Ümit'in uyku kalitesi %12 arttı{'\n'}
+            🚶‍♂️ Aktivite seviyesi %8 yükseldi{'\n'}
+            💡 Öneriler: Su tüketimi artırılmalı, meditasyon desteği verilebilir
+          </Text>
+        </View>
+
         {/* Patient Alerts */}
         <View style={styles.alertsCard}>
           <Text style={styles.alertsTitle}>Hasta Uyarıları</Text>
           <View style={styles.alertItem}>
-            <MaterialIcons name="warning" size={20} color="#F44336" />
-            <Text style={styles.alertText}>Ahmet Y. - Yüksek ateş (38.5°C)</Text>
+            <MaterialIcons name="warning" size={20} color={theme.colors.warning} />
+            <Text style={styles.alertText}>Ümit B. - Uyku düzeni değişti (+12%)</Text>
           </View>
           <View style={styles.alertItem}>
-            <MaterialIcons name="info" size={20} color="#FF9800" />
-            <Text style={styles.alertText}>Fatma K. - İlaç uyumu düşük (%60)</Text>
+            <MaterialIcons name="info" size={20} color={theme.colors.info} />
+            <Text style={styles.alertText}>Fatma K. - İlaç uyumu arttı (%85)</Text>
           </View>
         </View>
 
@@ -360,7 +403,7 @@ export default function Index() {
           <Text style={styles.cardTitle}>Bugünkü Randevular</Text>
           <View style={styles.appointmentItem}>
             <Text style={styles.appointmentTime}>09:00</Text>
-            <Text style={styles.appointmentPatient}>Ahmet Y.</Text>
+            <Text style={styles.appointmentPatient}>Ümit B.</Text>
             <Text style={styles.appointmentType}>Kontrol</Text>
           </View>
           <View style={styles.appointmentItem}>
@@ -372,17 +415,17 @@ export default function Index() {
 
         {/* Patient Stats Overview */}
         <View style={styles.overviewGrid}>
-          <View style={[styles.overviewCard, { backgroundColor: '#4A90E2' }]}>
+          <View style={[styles.overviewCard, { backgroundColor: theme.colors.primary }]}>
             <Text style={styles.overviewNumber}>23</Text>
             <Text style={styles.overviewLabel}>Aktif Hasta</Text>
           </View>
-          <View style={[styles.overviewCard, { backgroundColor: '#F44336' }]}>
-            <Text style={styles.overviewNumber}>3</Text>
-            <Text style={styles.overviewLabel}>Kritik Durum</Text>
+          <View style={[styles.overviewCard, { backgroundColor: theme.colors.warning }]}>
+            <Text style={styles.overviewNumber}>2</Text>
+            <Text style={styles.overviewLabel}>Dikkat Gerekli</Text>
           </View>
-          <View style={[styles.overviewCard, { backgroundColor: '#4CAF50' }]}>
-            <Text style={styles.overviewNumber}>87%</Text>
-            <Text style={styles.overviewLabel}>İlaç Uyumu</Text>
+          <View style={[styles.overviewCard, { backgroundColor: theme.colors.success }]}>
+            <Text style={styles.overviewNumber}>92%</Text>
+            <Text style={styles.overviewLabel}>İyileşme Oranı</Text>
           </View>
         </View>
       </ScrollView>
@@ -390,19 +433,19 @@ export default function Index() {
       {/* Doctor Bottom Nav */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="dashboard" size={24} color="#5AACB0" />
+          <MaterialIcons name="dashboard" size={24} color={theme.colors.primary} />
           <Text style={[styles.navText, styles.activeNavText]}>Dashboard</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="people" size={24} color="#B0BEC5" />
+          <MaterialIcons name="people" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Hastalar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="calendar-today" size={24} color="#B0BEC5" />
+          <MaterialIcons name="calendar-today" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Randevular</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="assessment" size={24} color="#B0BEC5" />
+          <MaterialIcons name="assessment" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Raporlar</Text>
         </TouchableOpacity>
       </View>
@@ -411,7 +454,7 @@ export default function Index() {
 
   const renderCaregiverDashboard = () => (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#5AACB0" barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.primary} barStyle="light-content" />
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Caregiver Header */}
@@ -425,19 +468,30 @@ export default function Index() {
           </TouchableOpacity>
         </View>
 
+        {/* İyileştirme Takibi - Bakıcı */}
+        <View style={styles.caregiverImprovementCard}>
+          <MaterialIcons name="track-changes" size={24} color={theme.colors.accent} />
+          <Text style={styles.improvementTitle}>Ümit'in İyileşme Süreci</Text>
+          <Text style={styles.improvementText}>
+            😴 Uyku kalitesi: Mükemmel (+12%){'\n'}
+            🚶 Günlük aktivite: Çok iyi (+8%){'\n'}
+            💡 Yapılacaklar: Su hatırlatması, öğle istirahat
+          </Text>
+        </View>
+
         {/* Patient Status */}
         <View style={styles.patientStatusCard}>
           <Text style={styles.cardTitle}>Hasta Durumu</Text>
           <View style={styles.statusRow}>
-            <MaterialIcons name="favorite" size={20} color="#4CAF50" />
-            <Text style={styles.statusText}>Genel durum: İyi</Text>
+            <MaterialIcons name="favorite" size={20} color={theme.colors.success} />
+            <Text style={styles.statusText}>Genel durum: Çok İyi (+15%)</Text>
           </View>
           <View style={styles.statusRow}>
-            <MaterialIcons name="medication" size={20} color="#FF9800" />
-            <Text style={styles.statusText}>İlaç hatırlatması: 2 adet</Text>
+            <MaterialIcons name="medication" size={20} color={theme.colors.success} />
+            <Text style={styles.statusText}>İlaç uyumu: %95 (artış)</Text>
           </View>
           <View style={styles.statusRow}>
-            <MaterialIcons name="schedule" size={20} color="#2196F3" />
+            <MaterialIcons name="schedule" size={20} color={theme.colors.info} />
             <Text style={styles.statusText}>Sonraki randevu: Yarın 14:00</Text>
           </View>
         </View>
@@ -446,34 +500,34 @@ export default function Index() {
         <View style={styles.careTasksCard}>
           <Text style={styles.cardTitle}>Bugünkü Görevler</Text>
           <View style={styles.taskItem}>
-            <MaterialIcons name="check-circle" size={20} color="#4CAF50" />
-            <Text style={styles.taskText}>Sabah ilaçları verildi</Text>
+            <MaterialIcons name="check-circle" size={20} color={theme.colors.success} />
+            <Text style={styles.taskText}>Sabah ilaçları verildi ✓</Text>
           </View>
           <View style={styles.taskItem}>
-            <MaterialIcons name="radio-button-unchecked" size={20} color="#B0BEC5" />
-            <Text style={styles.taskText}>Öğle yemeği</Text>
+            <MaterialIcons name="check-circle" size={20} color={theme.colors.success} />
+            <Text style={styles.taskText}>Uyku takibi yapıldı ✓</Text>
           </View>
           <View style={styles.taskItem}>
-            <MaterialIcons name="radio-button-unchecked" size={20} color="#B0BEC5" />
-            <Text style={styles.taskText}>Akşam ilaçları</Text>
+            <MaterialIcons name="radio-button-unchecked" size={20} color={theme.colors.textLight} />
+            <Text style={styles.taskText}>Akşam ilaçları (17:00)</Text>
           </View>
         </View>
 
         {/* Quick Actions for Caregiver */}
         <View style={styles.careActionsGrid}>
-          <TouchableOpacity style={[styles.careAction, { backgroundColor: '#4A90E2' }]}>
+          <TouchableOpacity style={[styles.careAction, { backgroundColor: theme.colors.medicine }]}>
             <MaterialIcons name="medication" size={32} color="#FFF" />
             <Text style={styles.careActionText}>İlaç{'\n'}Hatırlatması</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.careAction, { backgroundColor: '#F44336' }]}>
+          <TouchableOpacity style={[styles.careAction, { backgroundColor: theme.colors.error }]}>
             <MaterialIcons name="emergency" size={32} color="#FFF" />
             <Text style={styles.careActionText}>Acil{'\n'}Durum</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.careAction, { backgroundColor: '#4CAF50' }]}>
+          <TouchableOpacity style={[styles.careAction, { backgroundColor: theme.colors.success }]}>
             <MaterialIcons name="note-add" size={32} color="#FFF" />
             <Text style={styles.careActionText}>Günlük{'\n'}Rapor</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.careAction, { backgroundColor: '#FF9800' }]}>
+          <TouchableOpacity style={[styles.careAction, { backgroundColor: theme.colors.warning }]}>
             <MaterialIcons name="call" size={32} color="#FFF" />
             <Text style={styles.careActionText}>Doktor{'\n'}Ara</Text>
           </TouchableOpacity>
@@ -483,19 +537,19 @@ export default function Index() {
       {/* Caregiver Bottom Nav */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="home" size={24} color="#5AACB0" />
+          <MaterialIcons name="home" size={24} color={theme.colors.primary} />
           <Text style={[styles.navText, styles.activeNavText]}>Ana Sayfa</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="assignment" size={24} color="#B0BEC5" />
+          <MaterialIcons name="assignment" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Görevler</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="health-and-safety" size={24} color="#B0BEC5" />
+          <MaterialIcons name="health-and-safety" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Sağlık</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="person" size={24} color="#B0BEC5" />
+          <MaterialIcons name="person" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Profil</Text>
         </TouchableOpacity>
       </View>
@@ -515,29 +569,29 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F4F7',
+    backgroundColor: theme.colors.backgroundSecondary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F0F4F7',
+    backgroundColor: theme.colors.backgroundSecondary,
   },
   loadingText: {
     fontSize: 16,
-    color: '#5AACB0',
+    color: theme.colors.primary,
     marginTop: 10,
   },
   
   // Welcome Screen Styles
   welcomeHeader: {
-    backgroundColor: '#5AACB0',
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     paddingVertical: 60,
     paddingTop: 100,
   },
   welcomeTitle: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginTop: 20,
@@ -547,6 +601,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     opacity: 0.9,
     marginTop: 5,
+  },
+  welcomeImprovement: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    opacity: 0.95,
+    marginTop: 15,
+    paddingHorizontal: 20,
+    textAlign: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 12,
+    padding: 12,
   },
   welcomeContent: {
     flex: 1,
@@ -561,7 +626,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   loginButton: {
-    backgroundColor: '#5AACB0',
+    backgroundColor: theme.colors.primary,
     paddingVertical: 15,
     borderRadius: 12,
     marginBottom: 15,
@@ -577,10 +642,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#5AACB0',
+    borderColor: theme.colors.primary,
   },
   registerButtonText: {
-    color: '#5AACB0',
+    color: theme.colors.primary,
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
@@ -593,7 +658,7 @@ const styles = StyleSheet.create({
   
   // Patient Dashboard
   patientHeader: {
-    backgroundColor: '#5AACB0',
+    backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -608,8 +673,113 @@ const styles = StyleSheet.create({
   },
   nameText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold',    
     color: '#FFFFFF',
+  },
+
+  // İyileştirme kartları
+  improvementCard: {
+    backgroundColor: theme.colors.backgroundAccent,
+    margin: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.success,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  doctorImprovementCard: {
+    backgroundColor: '#E3F2FD',
+    margin: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.info,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  caregiverImprovementCard: {
+    backgroundColor: '#F3E5F5',
+    margin: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.accent,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  improvementTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 8,
+    marginLeft: 32,
+  },
+  improvementText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+    marginLeft: 32,
+  },
+
+  // Device Integration
+  devicePanel: {
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  deviceTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 12,
+  },
+  deviceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  deviceCard: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 12,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  deviceConnected: {
+    backgroundColor: '#E8F5E8',
+    borderColor: theme.colors.deviceConnected,
+  },
+  devicePending: {
+    backgroundColor: '#FFF4E6',
+    borderColor: theme.colors.devicePending,
+  },
+  deviceName: {
+    fontSize: 12,
+    color: theme.colors.text,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  deviceStatus: {
+    fontSize: 10,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+    textAlign: 'center',
   },
   
   moodCard: {
@@ -626,13 +796,14 @@ const styles = StyleSheet.create({
   moodTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: theme.colors.text,
     marginBottom: 15,
     textAlign: 'center',
   },
   moodEmojis: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginBottom: 10,
   },
   moodEmoji: {
     width: 50,
@@ -645,10 +816,16 @@ const styles = StyleSheet.create({
   selectedMood: {
     backgroundColor: '#E3F2FD',
     borderWidth: 2,
-    borderColor: '#5AACB0',
+    borderColor: theme.colors.primary,
   },
   emojiText: {
     fontSize: 24,
+  },
+  moodLabel: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '500',
+    color: theme.colors.text,
   },
   
   statsGrid: {
@@ -717,7 +894,7 @@ const styles = StyleSheet.create({
   },
   
   emergencyButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: theme.colors.error,
     marginHorizontal: 20,
     paddingVertical: 18,
     borderRadius: 16,
@@ -760,7 +937,7 @@ const styles = StyleSheet.create({
   
   // Doctor Dashboard
   doctorHeader: {
-    backgroundColor: '#5AACB0',
+    backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -788,7 +965,7 @@ const styles = StyleSheet.create({
   alertsTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: theme.colors.text,
     marginBottom: 15,
   },
   alertItem: {
@@ -798,7 +975,7 @@ const styles = StyleSheet.create({
   },
   alertText: {
     fontSize: 14,
-    color: '#333',
+    color: theme.colors.text,
     marginLeft: 10,
   },
   
@@ -817,7 +994,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: theme.colors.text,
     marginBottom: 15,
   },
   appointmentItem: {
@@ -831,18 +1008,18 @@ const styles = StyleSheet.create({
   appointmentTime: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#5AACB0',
+    color: theme.colors.primary,
     width: 60,
   },
   appointmentPatient: {
     fontSize: 16,
-    color: '#333',
+    color: theme.colors.text,
     flex: 1,
     marginLeft: 15,
   },
   appointmentType: {
     fontSize: 14,
-    color: '#666',
+    color: theme.colors.textSecondary,
   },
   
   overviewGrid: {
@@ -871,7 +1048,7 @@ const styles = StyleSheet.create({
   
   // Caregiver Dashboard
   caregiverHeader: {
-    backgroundColor: '#5AACB0',
+    backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -898,7 +1075,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 14,
-    color: '#333',
+    color: theme.colors.text,
     marginLeft: 10,
   },
   
@@ -921,7 +1098,7 @@ const styles = StyleSheet.create({
   },
   taskText: {
     fontSize: 14,
-    color: '#333',
+    color: theme.colors.text,
     marginLeft: 10,
   },
   
@@ -970,11 +1147,11 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: 10,
-    color: '#B0BEC5',
+    color: theme.colors.textLight,
     marginTop: 4,
   },
   activeNavText: {
-    color: '#5AACB0',
+    color: theme.colors.primary,
     fontWeight: '600',
   },
 });
