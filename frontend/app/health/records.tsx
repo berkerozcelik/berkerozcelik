@@ -820,6 +820,7 @@ export default function HealthRecords() {
           ))
         )}
       </ScrollView>
+      </Animated.View>
 
       {/* Add Record Modal */}
       <Modal
