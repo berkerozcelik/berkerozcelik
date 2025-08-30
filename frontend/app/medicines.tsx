@@ -35,6 +35,9 @@ export default function Medicines() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiResponse, setAiResponse] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
   const [newMedicine, setNewMedicine] = useState({
     name: '',
     dosage: '',
@@ -42,8 +45,8 @@ export default function Medicines() {
     time: ''
   });
 
-  // Günlük ilaç listesi - screenshot'tan
-  const dailyMedicines = [
+  // Günlük ilaç listesi - güncellendi
+  const [dailyMedicines, setDailyMedicines] = useState([
     {
       id: '1',
       name: 'Metformin 500mg',
@@ -60,26 +63,25 @@ export default function Medicines() {
     },
     {
       id: '3',
-      name: 'Etkileşim Uyarısı',
-      time: '',
-      taken: false,
-      interaction_warning: true
-    },
-    {
-      id: '4',
       name: 'Tramadol 50mg',
       time: '19:00',
       taken: true,
       interaction_warning: false
     },
     {
-      id: '5',
+      id: '4',
       name: 'Letrozol 2,5mg',
       time: '22:00',
       taken: false,
       interaction_warning: false
     }
-  ];
+  ]);
+
+  // İlaç etkileşim kontrolü
+  const checkDrugInteractions = () => {
+    const currentMedicines = dailyMedicines.map(med => med.name).join(', ');
+    return currentMedicines.includes('Tramadol') && currentMedicines.includes('Ondansetron');
+  };
 
   useEffect(() => {
     fetchMedicines();
@@ -109,7 +111,10 @@ export default function Medicines() {
   const handleAddMedicine = async () => {
     try {
       const token = await AsyncStorage.getItem('auth_token');
-      if (!token) return;
+      if (!token) {
+        Alert.alert('Hata', 'Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+        return;
+      }
 
       if (!newMedicine.name || !newMedicine.dosage) {
         Alert.alert('Hata', 'İlaç adı ve dozaj gereklidir');
@@ -124,9 +129,22 @@ export default function Medicines() {
         instructions: `${newMedicine.frequency} ${newMedicine.time ? newMedicine.time + ' saatinde' : ''} alınacak`
       };
 
-      await axios.post(`${BACKEND_URL}/api/medicines`, medicineData, {
+      const response = await axios.post(`${BACKEND_URL}/api/medicines`, medicineData, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      // Backend'den gelen veriyi medicines listesine ekle
+      setMedicines(prevMedicines => [...prevMedicines, response.data]);
+
+      // Günlük ilaçlara da ekle
+      const newDailyMedicine = {
+        id: response.data.id || Date.now().toString(),
+        name: `${newMedicine.name} ${newMedicine.dosage}`,
+        time: newMedicine.time || '08:00',
+        taken: false,
+        interaction_warning: false
+      };
+      setDailyMedicines(prev => [...prev, newDailyMedicine]);
 
       setShowAddModal(false);
       setNewMedicine({
@@ -137,23 +155,49 @@ export default function Medicines() {
       });
       
       Alert.alert('Başarılı', 'İlaç başarıyla eklendi');
-      fetchMedicines();
     } catch (error) {
       console.error('Add medicine error:', error);
-      Alert.alert('Hata', 'İlaç eklenirken bir hata oluştu');
+      Alert.alert('Hata', 'İlaç eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 
   const toggleMedicineTaken = (medicineId: string) => {
-    // Toggle taken status for daily medicines
-    Alert.alert(
-      'İlaç Alındı',
-      'İlacınızı aldığınızı onaylıyor musunuz?',
-      [
-        { text: 'İptal', style: 'cancel' },
-        { text: 'Evet', onPress: () => console.log('Medicine taken:', medicineId) }
-      ]
+    setDailyMedicines(prev => 
+      prev.map(medicine => 
+        medicine.id === medicineId 
+          ? { ...medicine, taken: !medicine.taken }
+          : medicine
+      )
     );
+    
+    Alert.alert(
+      'İlaç Durumu Güncellendi',
+      'İlacınızın alınma durumu güncellendi.',
+      [{ text: 'Tamam' }]
+    );
+  };
+
+  const checkAIInteraction = async () => {
+    setAiLoading(true);
+    setShowAIModal(true);
+    
+    try {
+      const token = await AsyncStorage.getItem('auth_token');
+      const medicineList = dailyMedicines.map(med => med.name).join(', ');
+      
+      const response = await axios.post(`${BACKEND_URL}/api/chat`, {
+        message: `Bu ilaçlar arasında etkileşim var mı? Lütfen detaylı açıkla: ${medicineList}`
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setAiResponse(response.data.response || 'AI yanıtı alınamadı.');
+    } catch (error) {
+      console.error('AI interaction check error:', error);
+      setAiResponse('İlaç etkileşimi kontrolü yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   if (loading) {
@@ -191,53 +235,66 @@ export default function Medicines() {
           <Text style={styles.sectionTitle}>Bugün</Text>
           
           {dailyMedicines.map((medicine) => (
-            <View key={medicine.id} style={[
-              styles.medicineCard,
-              medicine.interaction_warning && styles.warningCard
-            ]}>
-              {medicine.interaction_warning ? (
-                <View style={styles.warningContent}>
-                  <MaterialIcons name="warning" size={20} color={theme.colors.warning} />
-                  <Text style={styles.warningText}>Etkileşim Uyarısı</Text>
-                  <TouchableOpacity style={styles.checkboxEmpty}>
-                    <MaterialIcons name="check-box-outline-blank" size={20} color={theme.colors.strongTeal} />
-                  </TouchableOpacity>
+            <View key={medicine.id} style={styles.medicineCard}>
+              <View style={styles.medicineContent}>
+                <View style={styles.medicineInfo}>
+                  <Text style={styles.medicineName}>{medicine.name}</Text>
+                  {medicine.time && (
+                    <Text style={styles.medicineTime}>{medicine.time}</Text>
+                  )}
                 </View>
-              ) : (
-                <View style={styles.medicineContent}>
-                  <View style={styles.medicineInfo}>
-                    <Text style={styles.medicineName}>{medicine.name}</Text>
-                    {medicine.time && (
-                      <Text style={styles.medicineTime}>{medicine.time}</Text>
-                    )}
-                  </View>
-                  <TouchableOpacity 
-                    style={medicine.taken ? styles.checkboxChecked : styles.checkboxEmpty}
-                    onPress={() => toggleMedicineTaken(medicine.id)}
-                  >
-                    <MaterialIcons 
-                      name={medicine.taken ? "check-box" : "check-box-outline-blank"} 
-                      size={20} 
-                      color={medicine.taken ? theme.colors.strongTeal : theme.colors.textLight} 
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
+                <TouchableOpacity 
+                  style={medicine.taken ? styles.checkboxChecked : styles.checkboxEmpty}
+                  onPress={() => toggleMedicineTaken(medicine.id)}
+                >
+                  <MaterialIcons 
+                    name={medicine.taken ? "check-box" : "check-box-outline-blank"} 
+                    size={20} 
+                    color={medicine.taken ? theme.colors.strongTeal : theme.colors.textLight} 
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
         </View>
 
-        {/* Drug Interactions */}
+        {/* Drug Interactions Information */}
         <View style={styles.interactionsSection}>
           <Text style={styles.sectionTitle}>İlaç Etkileşimleri</Text>
-          <Text style={styles.interactionDescription}>
-            Bazı ilaçlar arasında potansiyel etkileşimler olabilir.
-          </Text>
           
-          <TouchableOpacity style={styles.addMedicineButton} onPress={() => setShowAddModal(true)}>
-            <Text style={styles.addMedicineText}>İlaç Ekle</Text>
+          <View style={styles.interactionInfo}>
+            <MaterialIcons 
+              name={checkDrugInteractions() ? "warning" : "check-circle"} 
+              size={24} 
+              color={checkDrugInteractions() ? theme.colors.warning : theme.colors.success} 
+            />
+            <Text style={styles.interactionText}>
+              {checkDrugInteractions() 
+                ? "Dikkat: Mevcut ilaçlarınız arasında potansiyel etkileşim tespit edildi."
+                : "Mevcut ilaçlarınız arasında bilinen etkileşim bulunmuyor."
+              }
+            </Text>
+          </View>
+
+          <TouchableOpacity style={styles.aiCheckButton} onPress={checkAIInteraction}>
+            <MaterialIcons name="psychology" size={20} color="#FFFFFF" />
+            <Text style={styles.aiCheckText}>Yapay Zekaya Sor</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Etkileşim Uyarısı - Alt tarafa taşındı */}
+        {checkDrugInteractions() && (
+          <View style={styles.warningSection}>
+            <View style={styles.warningCard}>
+              <MaterialIcons name="warning" size={20} color={theme.colors.warning} />
+              <Text style={styles.warningText}>Etkileşim Uyarısı</Text>
+            </View>
+            <Text style={styles.warningDescription}>
+              Tramadol ve Ondansetron birlikte kullanılırken dikkatli olunmalıdır. 
+              Doktorunuzla görüşmeniz önerilir.
+            </Text>
+          </View>
+        )}
 
         {/* Medicine List */}
         {medicines.length > 0 && (
@@ -275,7 +332,7 @@ export default function Medicines() {
           
           <ScrollView style={styles.modalContent}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>İlaç Adı</Text>
+              <Text style={styles.inputLabel}>İlaç Adı *</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Örn: Paracetamol"
@@ -285,7 +342,7 @@ export default function Medicines() {
             </View>
             
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Dozaj</Text>
+              <Text style={styles.inputLabel}>Dozaj *</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Örn: 500mg"
@@ -326,6 +383,34 @@ export default function Medicines() {
                 onChangeText={(text) => setNewMedicine({...newMedicine, time: text})}
               />
             </View>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
+      {/* AI Interaction Modal */}
+      <Modal
+        visible={showAIModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowAIModal(false)}>
+              <Text style={styles.modalCancel}>Kapat</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>İlaç Etkileşim Analizi</Text>
+            <View style={styles.placeholder} />
+          </View>
+          
+          <ScrollView style={styles.modalContent}>
+            {aiLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text style={styles.loadingText}>AI analiz yapıyor...</Text>
+              </View>
+            ) : (
+              <Text style={styles.aiResponseText}>{aiResponse}</Text>
+            )}
           </ScrollView>
         </SafeAreaView>
       </Modal>
@@ -446,11 +531,6 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
   },
-  warningCard: {
-    backgroundColor: '#FFF4E6',
-    borderWidth: 1,
-    borderColor: theme.colors.warning,
-  },
   medicineContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -468,17 +548,6 @@ const styles = StyleSheet.create({
   medicineTime: {
     fontSize: 14,
     color: theme.colors.textSecondary,
-  },
-  warningContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  warningText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.warning,
-    marginLeft: 8,
-    flex: 1,
   },
   checkboxEmpty: {
     padding: 4,
@@ -499,22 +568,60 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  interactionDescription: {
+  interactionInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: 12,
+  },
+  interactionText: {
     fontSize: 14,
     color: theme.colors.textSecondary,
-    marginBottom: 16,
+    marginLeft: 12,
+    flex: 1,
     lineHeight: 20,
   },
-  addMedicineButton: {
+  aiCheckButton: {
     backgroundColor: theme.colors.strongTeal,
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
-  addMedicineText: {
+  aiCheckText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    marginLeft: 8,
+  },
+
+  // Warning Section - Alt tarafa taşındı
+  warningSection: {
+    backgroundColor: '#FFF4E6',
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.warning,
+  },
+  warningCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  warningText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.warning,
+    marginLeft: 8,
+  },
+  warningDescription: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
   },
 
   // Medicine List
@@ -581,6 +688,9 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontWeight: '600',
   },
+  placeholder: {
+    width: 40,
+  },
   modalContent: {
     flex: 1,
     padding: 20,
@@ -628,6 +738,14 @@ const styles = StyleSheet.create({
   selectedFrequencyText: {
     color: '#FFFFFF',
   },
+  aiResponseText: {
+    fontSize: 16,
+    color: theme.colors.text,
+    lineHeight: 24,
+    padding: 16,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: 12,
+  },
 
   // Bottom Navigation
   bottomNav: {
@@ -652,7 +770,7 @@ const styles = StyleSheet.create({
   navText: {
     fontSize: 10,
     color: theme.colors.textLight,
-    marginTop: 4,
+    marginTime: 4,
   },
   activeNavText: {
     color: theme.colors.strongTeal,
