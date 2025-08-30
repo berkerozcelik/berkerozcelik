@@ -111,7 +111,7 @@ class BackendTester:
                     "password": user_data['password']
                 }
                 async with self.session.post(
-                    f"{API_BASE_URL}/auth/login",
+                    f"{API_BASE_URL}/login",
                     json=login_data
                 ) as response:
                     if response.status == 200:
