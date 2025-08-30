@@ -738,13 +738,15 @@ class BackendTester:
             {
                 "doctor_name": "Dr. Mehmet Özkan",
                 "specialty": "Onkoloji",
-                "appointment_date": (datetime.utcnow() + timedelta(days=7)).isoformat(),
+                "date": (datetime.utcnow() + timedelta(days=7)).strftime("%Y-%m-%d"),
+                "time": "14:00",
                 "notes": "Kontrol muayenesi için randevu"
             },
             {
                 "doctor_name": "Dr. Zeynep Kaya",
                 "specialty": "Radyoloji", 
-                "appointment_date": (datetime.utcnow() + timedelta(days=14)).isoformat(),
+                "date": (datetime.utcnow() + timedelta(days=14)).strftime("%Y-%m-%d"),
+                "time": "10:30",
                 "notes": "MR çekimi için randevu"
             }
         ]
