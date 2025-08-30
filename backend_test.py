@@ -71,25 +71,25 @@ class BackendTester:
         """Test complete authentication system"""
         print("\n=== Testing Authentication System ===")
         
-        # Test user registration for different roles
+        # Test user registration for different roles - using demo accounts as requested
         demo_users = [
             {
-                "email": "hasta@test.com",
-                "password": "hasta123",
+                "email": "hasta@demo.com",
+                "password": "demo123",
                 "name": "Ahmet Yılmaz",
                 "role": "hasta",
                 "phone": "+90 555 123 4567"
             },
             {
-                "email": "doktor@test.com", 
-                "password": "doktor123",
+                "email": "doktor@demo.com", 
+                "password": "demo123",
                 "name": "Dr. Ayşe Demir",
                 "role": "doktor",
                 "phone": "+90 555 987 6543"
             },
             {
-                "email": "bakici@test.com",
-                "password": "bakici123", 
+                "email": "bakici@demo.com",
+                "password": "demo123", 
                 "name": "Fatma Özkan",
                 "role": "bakici",
                 "phone": "+90 555 456 7890"
