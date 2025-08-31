@@ -278,11 +278,12 @@ export default function Appointments() {
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation - Standart */}
       <View style={styles.bottomNav}>
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="home" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Ana Sayfa</Text>
@@ -291,35 +292,33 @@ export default function Appointments() {
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/medicines')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="medication" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>İlaçlar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Planım</Text>
+        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
+          <MaterialIcons name="event" size={24} color={theme.colors.strongTeal} />
+          <Text style={[styles.navText, styles.activeNavText]}>Planlarım</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/health/records')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="favorite" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Sağlık</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-          <MaterialIcons name="event" size={24} color={theme.colors.strongTeal} />
-          <Text style={[styles.navText, styles.activeNavText]}>Randevu</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => router.push('/profile')}
+          onPress={() => router.push('/ai-chat')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="person" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Profil</Text>
+          <MaterialIcons name="chat" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>AI Chat</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
