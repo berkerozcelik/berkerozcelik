@@ -22,7 +22,7 @@ import * as Notifications from 'expo-notifications';
 import { theme } from './theme';
 import { notificationService, MedicineReminder, generateWeeklyMedicineReport } from '../utils/notifications';
 
-const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL || 'https://onkom-health-ai.preview.emergentagent.com';
 
 interface Medicine {
   id: string;
