@@ -193,7 +193,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 def create_demo_data():
     """Create demo users and sample data"""
     demo_users = [
-        {"email": "hasta@demo.com", "name": "Ümit Hastam", "password": "demo123", "role": "hasta"},
+        {"email": "hasta@demo.com", "name": "Ümit Aksoy", "password": "demo123", "role": "hasta"},
         {"email": "doktor@demo.com", "name": "Dr. Ahmet Yılmaz", "password": "demo123", "role": "doktor"},
         {"email": "bakici@demo.com", "name": "Ayşe Bakıcı", "password": "demo123", "role": "bakici"}
     ]
