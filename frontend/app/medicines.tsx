@@ -141,40 +141,8 @@ export default function Medicines() {
   };
 
   useEffect(() => {
-    const initializePage = async () => {
-      await fetchMedicines();
-      await initializeNotifications();
-      
-      // Start entrance animations after loading
-      setTimeout(() => {
-        headerAnimation.fadeIn();
-        contentAnimation.animate(true);
-        startMedicineStagger();
-      }, 100);
-    };
-    
-    initializePage();
-    
-    // Notification listeners
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Bildirim alındı:', notification);
-    });
-
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      const data = response.notification.request.content.data;
-      if (data.type === 'medicine_reminder') {
-        handleNotificationResponse(data.medicineId, data.medicineName);
-      }
-    });
-
-    return () => {
-      if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-      }
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
-    };
+    // Basit initialization
+    setLoading(false);
   }, []);
 
   const initializeNotifications = async () => {
