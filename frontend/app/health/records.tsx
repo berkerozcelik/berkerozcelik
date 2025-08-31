@@ -1159,6 +1159,7 @@ const styles = StyleSheet.create({
   chartStyle: {
     borderRadius: 12,
     marginVertical: 8,
+    backgroundColor: '#FFFFFF',
   },
 
   // Chart Analysis
