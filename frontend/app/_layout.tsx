@@ -31,13 +31,12 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="auth" />
-        <Stack.Screen name="health" />
         <Stack.Screen name="appointments" />
         <Stack.Screen name="medicines" />
         <Stack.Screen name="nutrition" />
         <Stack.Screen name="exercise" />
         <Stack.Screen name="ai-chat" />
+        <Stack.Screen name="profile" />
       </Stack>
     </>
   );
