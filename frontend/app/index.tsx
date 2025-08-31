@@ -169,6 +169,8 @@ export default function Index() {
       }
     } catch (error) {
       console.error('Health data fetch error:', error);
+      // Don't block app loading if health data fails
+      // User can still use the app without latest health data
     }
   };
 
