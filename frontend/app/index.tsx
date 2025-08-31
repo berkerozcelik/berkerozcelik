@@ -591,54 +591,47 @@ export default function Index() {
         </SafeAreaView>
       </Modal>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation - Standart */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'home' && styles.activeNavItem]}
-          onPress={() => setActiveTab('home')}
-        >
-          <MaterialIcons name="home" size={24} color={activeTab === 'home' ? theme.colors.strongTeal : theme.colors.textLight} />
-          <Text style={[styles.navText, activeTab === 'home' && styles.activeNavText]}>Ana Sayfa</Text>
+        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
+          <MaterialIcons name="home" size={24} color={theme.colors.strongTeal} />
+          <Text style={[styles.navText, styles.activeNavText]}>Ana Sayfa</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'medicines' && styles.activeNavItem]}
-          onPress={() => navigateToScreen('medicines')}
+          style={styles.navItem}
+          onPress={() => router.push('/medicines')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="medication" size={24} color={activeTab === 'medicines' ? theme.colors.strongTeal : theme.colors.textLight} />
-          <Text style={[styles.navText, activeTab === 'medicines' && styles.activeNavText]}>İlaçlar</Text>
+          <MaterialIcons name="medication" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>İlaçlar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'appointments' && styles.activeNavItem]}
-          onPress={() => navigateToScreen('appointments')}
+          style={styles.navItem}
+          onPress={() => router.push('/appointments')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="event" size={24} color={activeTab === 'appointments' ? theme.colors.strongTeal : theme.colors.textLight} />
-          <Text style={[styles.navText, activeTab === 'appointments' && styles.activeNavText]}>Planım</Text>
+          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Planlarım</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'health' && styles.activeNavItem]}
-          onPress={() => navigateToScreen('health/records')}
+          style={styles.navItem}
+          onPress={() => router.push('/health/records')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="favorite" size={24} color={activeTab === 'health' ? theme.colors.strongTeal : theme.colors.textLight} />
-          <Text style={[styles.navText, activeTab === 'health' && styles.activeNavText]}>Sağlık</Text>
+          <MaterialIcons name="favorite" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>Sağlık</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'appointments' && styles.activeNavItem]}
-          onPress={() => navigateToScreen('appointments')}
+          style={styles.navItem}
+          onPress={() => router.push('/ai-chat')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="event" size={24} color={activeTab === 'appointments' ? theme.colors.strongTeal : theme.colors.textLight} />
-          <Text style={[styles.navText, activeTab === 'appointments' && styles.activeNavText]}>Randevu</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'profile' && styles.activeNavItem]}
-          onPress={() => navigateToScreen('profile')}
-        >
-          <MaterialIcons name="person" size={24} color={activeTab === 'profile' ? theme.colors.strongTeal : theme.colors.textLight} />
-          <Text style={[styles.navText, activeTab === 'profile' && styles.activeNavText]}>Profil</Text>
+          <MaterialIcons name="chat" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>AI Chat</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
