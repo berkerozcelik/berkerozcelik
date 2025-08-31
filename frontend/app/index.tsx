@@ -301,7 +301,7 @@ export default function Index() {
       <StatusBar backgroundColor={theme.colors.backgroundLight} barStyle="dark-content" />
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Header */}
+        {/* Merhaba Ümit Header */}
         <View style={styles.header}>
           <Text style={styles.greeting}>Merhaba</Text>
           <Text style={styles.userName}>Ümit</Text>
@@ -310,14 +310,30 @@ export default function Index() {
           </TouchableOpacity>
         </View>
 
-        {/* Tahmine Dayalı Sağlık Analizi - YENİ MODÜL */}
+        {/* Üstteki Kart Yapısı - Bugün Daha İyisin (EN ÜST) */}
+        <View style={styles.improvementCardTop}>
+          <View style={styles.improvementHeader}>
+            <MaterialIcons name="trending-up" size={28} color={theme.colors.success} />
+            <Text style={styles.improvementTitleTop}>🎉 Bugün Daha İyisin!</Text>
+          </View>
+          <Text style={styles.improvementTextTop}>
+            😴 Uyku kaliteniz %15 arttı (7s 20dk){'\n'}
+            🚶‍♂️ Adım sayınız hedefin üzerinde (6.542){'\n'}
+            💡 Harika gidiyorsun! Su içmeyi unutma
+          </Text>
+          <View style={styles.improvementProgress}>
+            <View style={styles.progressBarTop} />
+          </View>
+        </View>
+
+        {/* Sağlık Öngörüleri - AI Tahmine Dayalı Modül */}
         <View style={styles.predictiveAnalysisContainer}>
           <View style={styles.analysisHeader}>
             <MaterialIcons name="psychology" size={28} color={theme.colors.strongTeal} />
-            <Text style={styles.analysisTitle}>AI Sağlık Öngörüleri</Text>
+            <Text style={styles.analysisTitle}>🤖 Sağlık Öngörüleri</Text>
           </View>
           <Text style={styles.analysisSubtitle}>
-            Sağlık verileriniz analiz edilerek kişiselleştirilmiş öngörüler oluşturuldu
+            AI ile sağlık verileriniz analiz edilerek kişiselleştirilmiş öngörüler oluşturuldu
           </Text>
           
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.predictionsScroll}>
