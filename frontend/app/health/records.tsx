@@ -951,11 +951,12 @@ export default function HealthRecords() {
         </SafeAreaView>
       </Modal>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation - Temizlenmiş */}
       <View style={styles.bottomNav}>
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="home" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Ana Sayfa</Text>
@@ -964,6 +965,7 @@ export default function HealthRecords() {
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/medicines')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="medication" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>İlaçlar</Text>
@@ -972,9 +974,10 @@ export default function HealthRecords() {
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/appointments')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Planım</Text>
+          <Text style={styles.navText}>Randevu</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
@@ -984,18 +987,11 @@ export default function HealthRecords() {
 
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => router.push('/appointments')}
+          onPress={() => router.push('/ai-chat')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Randevu</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.navItem}
-          onPress={() => router.push('/profile')}
-        >
-          <MaterialIcons name="person" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Profil</Text>
+          <MaterialIcons name="chat" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>AI Chat</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
