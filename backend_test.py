@@ -112,7 +112,7 @@ class BackendTester:
                     "password": user_data['password']
                 }
                 async with self.session.post(
-                    f"{API_BASE_URL}/login",
+                    f"{API_BASE_URL}/auth/login",  # UPDATED TO MATCH REVIEW REQUEST ENDPOINT
                     json=login_data
                 ) as response:
                     if response.status == 200:
