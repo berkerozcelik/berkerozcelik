@@ -573,7 +573,11 @@ export default function HealthRecords() {
 
       {/* Animated Content */}
       <Animated.View style={[styles.contentContainer, contentAnimation.animatedStyle]}>
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
         {/* Period Selection - Animated */}
         <View style={styles.periodSelection}>
           <Text style={styles.sectionTitle}>📅 Zaman Aralığı</Text>
