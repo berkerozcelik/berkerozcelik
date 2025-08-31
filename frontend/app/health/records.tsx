@@ -1317,7 +1317,7 @@ const styles = StyleSheet.create({
   // Records List
   recordsList: {
     marginHorizontal: 16,
-    marginBottom: 100,
+    marginBottom: 20,
   },
   recordCard: {
     backgroundColor: '#FFFFFF',
