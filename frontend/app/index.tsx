@@ -20,7 +20,8 @@ import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from './theme';
 
-const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL || 'https://onkom-health-ai.preview.emergentagent.com';
+console.log('BACKEND_URL:', BACKEND_URL);
 const { width } = Dimensions.get('window');
 
 interface User {
