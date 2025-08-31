@@ -363,22 +363,6 @@ export default function Index() {
           </ScrollView>
         </View>
 
-        {/* Bugün Daha İyisin - Interaktif ve Büyük */}
-        <TouchableOpacity style={styles.improvementCardLarge}>
-          <View style={styles.improvementHeader}>
-            <MaterialIcons name="trending-up" size={32} color={theme.colors.success} />
-            <Text style={styles.improvementTitleLarge}>Bugün Daha İyisin! 🎉</Text>
-          </View>
-          <Text style={styles.improvementTextLarge}>
-            ✅ Uyku kaliteniz %15 arttı (7s 20dk){'\n'}
-            ✅ Adım sayınız hedefin üzerinde (6.542){'\n'}
-            💡 Harika gidiyorsun! Su içmeyi unutma
-          </Text>
-          <View style={styles.improvementProgress}>
-            <View style={styles.progressBarLarge} />
-          </View>
-        </TouchableOpacity>
-
         {/* Bugün Seni Neler Bekliyor */}
         <View style={styles.todayTasksContainer}>
           <Text style={styles.sectionTitle}>Bugün Seni Neler Bekliyor</Text>
