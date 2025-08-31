@@ -47,8 +47,6 @@ export default function Medicines() {
   const [aiLoading, setAiLoading] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationToken, setNotificationToken] = useState<string | null>(null);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
   const [newMedicine, setNewMedicine] = useState({
     name: '',
     dosage: '',
@@ -56,19 +54,6 @@ export default function Medicines() {
     time: '',
     notifications_enabled: true
   });
-
-  // Animation state
-  const pulseScale = useSharedValue(1);
-  const successAnimation = useSharedValue(0);
-
-  const animatedPulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }],
-  }));
-
-  const animatedSuccessStyle = useAnimatedStyle(() => ({
-    opacity: successAnimation.value,
-    transform: [{ scale: successAnimation.value }],
-  }));
 
   // Günlük ilaç listesi - güncellendi
   const [dailyMedicines, setDailyMedicines] = useState([
