@@ -152,6 +152,130 @@ class BackendTester:
             except Exception as e:
                 self.log_result('authentication', "JWT Token Validation", False, str(e))
 
+        # Test unauthorized access (error handling for unauthorized requests)
+        await self.test_unauthorized_access()
+        
+        # Test backend performance as per review request
+        await self.test_backend_performance()
+
+    async def test_unauthorized_access(self):
+        """Test error handling for unauthorized requests as per review request"""
+        print("\n=== Testing Unauthorized Access Error Handling ===")
+        
+        # Test endpoints without authentication
+        unauthorized_endpoints = [
+            ("/api/health/records", "GET"),
+            ("/api/health/records", "POST"),
+            ("/api/health/records/latest", "GET"),
+            ("/api/appointments", "GET"),
+            ("/api/appointments", "POST"),
+            ("/api/medicines", "GET"),
+            ("/api/medicines", "POST"),
+            ("/api/chat", "POST"),
+            ("/api/predictive-analysis", "GET"),
+            ("/api/predictive-analysis/refresh", "POST")
+        ]
+        
+        for endpoint, method in unauthorized_endpoints:
+            try:
+                if method == "GET":
+                    async with self.session.get(f"{API_BASE_URL}{endpoint}") as response:
+                        if response.status == 401:
+                            self.log_result('authentication', f"Unauthorized {method} {endpoint}", True, 
+                                          "✅ Correctly returns 401 Unauthorized")
+                        else:
+                            self.log_result('authentication', f"Unauthorized {method} {endpoint}", False, 
+                                          f"❌ Expected 401, got {response.status}")
+                elif method == "POST":
+                    test_data = {"test": "data"}
+                    async with self.session.post(f"{API_BASE_URL}{endpoint}", json=test_data) as response:
+                        if response.status == 401:
+                            self.log_result('authentication', f"Unauthorized {method} {endpoint}", True, 
+                                          "✅ Correctly returns 401 Unauthorized")
+                        else:
+                            self.log_result('authentication', f"Unauthorized {method} {endpoint}", False, 
+                                          f"❌ Expected 401, got {response.status}")
+            except Exception as e:
+                self.log_result('authentication', f"Unauthorized {method} {endpoint}", False, str(e))
+
+    async def test_backend_performance(self):
+        """Test backend performance as per review request"""
+        print("\n=== Testing Backend Performance ===")
+        
+        if 'hasta' not in self.auth_tokens:
+            self.log_result('authentication', "Performance Test", False, "No patient token available")
+            return
+
+        headers = {"Authorization": f"Bearer {self.auth_tokens['hasta']}"}
+        
+        # Test API response times
+        performance_endpoints = [
+            ("/api/health", "GET", None),
+            ("/api/health/records", "GET", None),
+            ("/api/health/records/latest", "GET", None),
+            ("/api/appointments", "GET", None),
+            ("/api/medicines", "GET", None),
+            ("/api/predictive-analysis", "GET", None)
+        ]
+        
+        for endpoint, method, data in performance_endpoints:
+            try:
+                start_time = asyncio.get_event_loop().time()
+                
+                if method == "GET":
+                    if endpoint == "/api/health":
+                        async with self.session.get(f"{API_BASE_URL}{endpoint}") as response:
+                            end_time = asyncio.get_event_loop().time()
+                            response_time = (end_time - start_time) * 1000  # Convert to ms
+                    else:
+                        async with self.session.get(f"{API_BASE_URL}{endpoint}", headers=headers) as response:
+                            end_time = asyncio.get_event_loop().time()
+                            response_time = (end_time - start_time) * 1000  # Convert to ms
+                
+                if response.status in [200, 404]:  # 404 is acceptable for empty collections
+                    if response_time < 2000:  # Less than 2 seconds
+                        self.log_result('authentication', f"Performance {endpoint}", True, 
+                                      f"✅ Response time: {response_time:.0f}ms")
+                    else:
+                        self.log_result('authentication', f"Performance {endpoint}", False, 
+                                      f"❌ Slow response: {response_time:.0f}ms")
+                else:
+                    self.log_result('authentication', f"Performance {endpoint}", False, 
+                                  f"❌ HTTP {response.status}")
+                    
+            except Exception as e:
+                self.log_result('authentication', f"Performance {endpoint}", False, str(e))
+
+        # Test concurrent requests
+        await self.test_concurrent_requests(headers)
+
+    async def test_concurrent_requests(self, headers):
+        """Test server stability with concurrent requests"""
+        print("\n=== Testing Concurrent Requests ===")
+        
+        async def make_request():
+            try:
+                async with self.session.get(f"{API_BASE_URL}/health/records", headers=headers) as response:
+                    return response.status == 200 or response.status == 404
+            except:
+                return False
+        
+        # Test 5 concurrent requests
+        tasks = [make_request() for _ in range(5)]
+        start_time = asyncio.get_event_loop().time()
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        end_time = asyncio.get_event_loop().time()
+        
+        successful_requests = sum(1 for result in results if result is True)
+        total_time = (end_time - start_time) * 1000
+        
+        if successful_requests >= 4:  # At least 80% success
+            self.log_result('authentication', "Concurrent Requests", True, 
+                          f"✅ {successful_requests}/5 requests successful in {total_time:.0f}ms")
+        else:
+            self.log_result('authentication', "Concurrent Requests", False, 
+                          f"❌ Only {successful_requests}/5 requests successful")
+
     async def test_health_records_api(self):
         """Test health records API"""
         print("\n=== Testing Health Records API ===")
