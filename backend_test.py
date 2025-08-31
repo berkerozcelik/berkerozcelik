@@ -73,25 +73,26 @@ class BackendTester:
         print("\n=== Testing Authentication System ===")
         
         # Test user registration for different roles - using demo accounts as requested
+        # CRITICAL: Testing "Ümit Aksoy" name update as specified in review request
         demo_users = [
             {
                 "email": "hasta@demo.com",
                 "password": "demo123",
-                "name": "Ahmet Yılmaz",
+                "name": "Ümit Aksoy",  # UPDATED NAME AS PER REVIEW REQUEST
                 "role": "hasta",
                 "phone": "+90 555 123 4567"
             },
             {
                 "email": "doktor@demo.com", 
                 "password": "demo123",
-                "name": "Dr. Ayşe Demir",
+                "name": "Dr. Ahmet Yılmaz",
                 "role": "doktor",
                 "phone": "+90 555 987 6543"
             },
             {
                 "email": "bakici@demo.com",
                 "password": "demo123", 
-                "name": "Fatma Özkan",
+                "name": "Ayşe Bakıcı",
                 "role": "bakici",
                 "phone": "+90 555 456 7890"
             }
