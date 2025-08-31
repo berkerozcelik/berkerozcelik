@@ -149,15 +149,19 @@ export default function Medicines() {
   };
 
   useEffect(() => {
-    fetchMedicines();
-    initializeNotifications();
+    const initializePage = async () => {
+      await fetchMedicines();
+      await initializeNotifications();
+      
+      // Start entrance animations after loading
+      setTimeout(() => {
+        headerAnimation.fadeIn();
+        contentAnimation.animate(true);
+        startMedicineStagger();
+      }, 100);
+    };
     
-    // Start entrance animations
-    setTimeout(() => {
-      headerAnimation.fadeIn();
-      contentAnimation.animate(true);
-      startMedicineStagger();
-    }, 100);
+    initializePage();
     
     // Notification listeners
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
