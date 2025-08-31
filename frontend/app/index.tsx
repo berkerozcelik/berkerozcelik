@@ -824,6 +824,42 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
+  // Üstteki İyileştirme Kartı - EN ÜST KART
+  improvementCardTop: {
+    backgroundColor: '#E8F5E8',
+    margin: 16,
+    marginTop: 8,
+    padding: 20,
+    borderRadius: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.success,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  improvementTitleTop: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginLeft: 12,
+    flex: 1,
+  },
+  improvementTextTop: {
+    fontSize: 16,
+    color: theme.colors.text,
+    lineHeight: 24,
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  progressBarTop: {
+    width: '85%',
+    height: 6,
+    backgroundColor: theme.colors.success,
+    borderRadius: 3,
+  },
+
   // İyileştirme kartı - Büyük ve Interaktif
   improvementCardLarge: {
     backgroundColor: theme.colors.lightBlue,
