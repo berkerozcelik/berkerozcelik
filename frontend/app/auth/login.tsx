@@ -51,11 +51,11 @@ export default function Login() {
         password
       });
 
-      const { access_token, user } = response.data;
+      const { token, user } = response.data;
       
       // Store authentication data
       await AsyncStorage.multiSet([
-        ['auth_token', access_token],
+        ['auth_token', token],
         ['user_data', JSON.stringify(user)]
       ]);
 
