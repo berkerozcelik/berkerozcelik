@@ -872,11 +872,12 @@ export default function Medicines() {
         </Animated.View>
       </Modal>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation - Standart */}
       <View style={styles.bottomNav}>
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="home" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Ana Sayfa</Text>
@@ -890,14 +891,16 @@ export default function Medicines() {
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/appointments')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Planım</Text>
+          <Text style={styles.navText}>Planlarım</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.navItem}
           onPress={() => router.push('/health/records')}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="favorite" size={24} color={theme.colors.textLight} />
           <Text style={styles.navText}>Sağlık</Text>
@@ -905,18 +908,11 @@ export default function Medicines() {
 
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => router.push('/appointments')}
+          onPress={() => router.push('/ai-chat')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="event" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Randevu</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.navItem}
-          onPress={() => router.push('/profile')}
-        >
-          <MaterialIcons name="person" size={24} color={theme.colors.textLight} />
-          <Text style={styles.navText}>Profil</Text>
+          <MaterialIcons name="chat" size={24} color={theme.colors.textLight} />
+          <Text style={styles.navText}>AI Chat</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
