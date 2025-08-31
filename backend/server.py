@@ -199,16 +199,17 @@ def create_demo_data():
     ]
     
     for user_data in demo_users:
-        existing_user = users_collection.find_one({"email": user_data["email"]})
-        if not existing_user:
-            user = User(
-                email=user_data["email"],
-                name=user_data["name"],
-                password_hash=hash_password(user_data["password"]),
-                role=user_data["role"]
-            )
-            users_collection.insert_one(user.dict())
-            print(f"Demo user created: {user_data['email']}")
+        # First delete if exists
+        users_collection.delete_one({"email": user_data["email"]})
+        # Then create new with updated data
+        user = User(
+            email=user_data["email"],
+            name=user_data["name"],
+            password_hash=hash_password(user_data["password"]),
+            role=user_data["role"]
+        )
+        users_collection.insert_one(user.dict())
+        print(f"Demo user created: {user_data['email']}")
 
 # Generate AI-powered predictive analysis
 async def generate_predictive_analysis(user_id: str, health_data: dict) -> List[PredictiveAnalysis]:
