@@ -118,8 +118,18 @@ class BackendTester:
                     if response.status == 200:
                         data = await response.json()
                         self.auth_tokens[role] = data['token']
+                        
+                        # CRITICAL: Verify "Ümit Aksoy" name update as per review request
+                        user_name = data.get('user', {}).get('name', '')
+                        if role == 'hasta' and user_name == "Ümit Aksoy":
+                            self.log_result('authentication', f"Name Verification - Ümit Aksoy", True, 
+                                          f"✅ CRITICAL FIX VERIFIED: Patient name correctly updated to 'Ümit Aksoy'")
+                        elif role == 'hasta':
+                            self.log_result('authentication', f"Name Verification - Ümit Aksoy", False, 
+                                          f"❌ CRITICAL ISSUE: Expected 'Ümit Aksoy', got '{user_name}'")
+                        
                         self.log_result('authentication', f"Login {role}", True, 
-                                      f"JWT token received for {user_data['name']}")
+                                      f"JWT token received for {user_name}")
                     else:
                         error_text = await response.text()
                         self.log_result('authentication', f"Login {role}", False, 
